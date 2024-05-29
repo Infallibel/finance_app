@@ -22,13 +22,13 @@ class TextButtonModel extends StatelessWidget {
       padding: const EdgeInsets.only(top: 8, bottom: 24),
       child: TextButton(
         style: ButtonStyle(
-          shape: MaterialStateProperty.all(RoundedRectangleBorder(
+          shape: WidgetStateProperty.all(RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           )),
-          backgroundColor: MaterialStateProperty.resolveWith(
+          backgroundColor: WidgetStateProperty.resolveWith(
             (states) => backgroundColor,
           ),
-          overlayColor: MaterialStateProperty.resolveWith(
+          overlayColor: WidgetStateProperty.resolveWith(
             (states) => overlayColor,
           ),
         ),

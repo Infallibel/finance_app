@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
 
 class TransactionAmount extends StatelessWidget {
-  const TransactionAmount({super.key, required this.amount});
+  const TransactionAmount(
+      {super.key, required this.amount, required this.transactionType});
 
   final double amount;
+  final String transactionType;
 
   @override
   Widget build(BuildContext context) {
@@ -13,24 +15,42 @@ class TransactionAmount extends StatelessWidget {
     String wholePart = parts[0];
     String fractionPart = parts[1];
 
+    Color wholePartColor;
+    Color fractionPartColor;
+
+    switch (transactionType) {
+      case 'Income':
+        wholePartColor = kColorSuccess;
+        fractionPartColor = kColorSuccess;
+        break;
+      case 'Expenses':
+        wholePartColor = kColorBlack;
+        fractionPartColor = kColorGrey2;
+        break;
+      case 'Transfer':
+        wholePartColor = kColorBlue;
+        fractionPartColor = kColorBlue;
+        break;
+      default:
+        wholePartColor = kColorGrey2;
+        fractionPartColor = kColorGrey2;
+    }
+
     return Row(
       children: [
         Text(
           '\$$wholePart',
-          style: amount >= 0
-              ? kFontStyleLato.copyWith(
-                  fontWeight: FontWeight.bold, color: kColorSuccess)
-              : kFontStyleLato.copyWith(fontWeight: FontWeight.bold),
+          style: kFontStyleLato.copyWith(
+            fontWeight: FontWeight.bold,
+            color: wholePartColor,
+          ),
         ),
         Text(
           '.$fractionPart',
-          style: amount >= 0
-              ? kFontStyleLato.copyWith(
-                  fontWeight: FontWeight.bold, color: kColorSuccess)
-              : kFontStyleLato.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: kColorGrey2,
-                ),
+          style: kFontStyleLato.copyWith(
+            fontWeight: FontWeight.bold,
+            color: fractionPartColor,
+          ),
         )
       ],
     );

@@ -11,7 +11,8 @@ class IconTextAndRow extends StatelessWidget {
       required this.inputText,
       this.amount,
       this.onTap,
-      this.selectionText});
+      this.selectionText,
+      this.transactionType});
 
   final IconData iconData;
   final Color iconColor;
@@ -19,6 +20,7 @@ class IconTextAndRow extends StatelessWidget {
   final double? amount;
   final VoidCallback? onTap;
   final String? selectionText;
+  final String? transactionType;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class IconTextAndRow extends StatelessWidget {
                 iconData: iconData, iconColor: iconColor, inputText: inputText),
             amount != null
                 ? TransactionAmount(
+                    transactionType: transactionType!,
                     amount: amount!,
                   )
                 : selectionText != null

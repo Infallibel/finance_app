@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:finance_app/widgets/total_balance_home.dart';
 import 'package:finance_app/widgets/transactions_day_column.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../services/transaction_data.dart';
+import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -57,15 +61,23 @@ class HomePage extends StatelessWidget {
                 height: 8,
               ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: 3, // Change this to the actual number of items
-                  itemBuilder: (context, index) {
-                    return TransactionDayColumn(
-                      day: index == 0
-                          ? 'Today'
-                          : index == 1
-                              ? '04 June 2023'
-                              : '02 June 2023',
+                child: BlocBuilder<TransactionDataCubit, List<TransactionData>>(
+                  builder: (context, transactions) {
+                    final transactionsByDay =
+                        context.read<TransactionDataCubit>().transactionsByDay;
+                    final transactionDays = transactionsByDay.keys.toList();
+
+                    return ListView.builder(
+                      itemCount: transactionDays.length,
+                      itemBuilder: (context, index) {
+                        final day = transactionDays[index];
+                        final transactions = transactionsByDay[day]!;
+
+                        return TransactionDayColumn(
+                          day: day,
+                          transactions: transactions,
+                        );
+                      },
                     );
                   },
                 ),

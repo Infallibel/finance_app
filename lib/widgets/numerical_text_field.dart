@@ -3,17 +3,15 @@ import 'package:finance_app/utilities/constants.dart';
 import 'package:flutter/services.dart';
 
 class NumericalTextField extends StatelessWidget {
-  NumericalTextField({
-    super.key,
-  });
-  final numberTextController = TextEditingController();
+  const NumericalTextField({super.key, required this.controller});
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: TextField(
-        controller: numberTextController,
+        controller: controller,
         cursorColor: kColorGrey2,
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         autofocus: true,

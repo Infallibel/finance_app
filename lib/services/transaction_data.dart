@@ -1,14 +1,14 @@
 class TransactionData {
   final String transactionType;
-  final int amount;
+  final double amount;
   final String user;
-  final String date;
-  final String category;
+  final DateTime date;
+  final Map<String, dynamic> category;
+  final Map<String, dynamic> paymentType;
 
-  ///raczej tu nie będą tylko String, bo będzie to też to wyboru, np paymentType, czy category
-  final String paymentType;
-  final String photo;
-  final String note;
+  ///tu nie będą tylko String, bo będzie to też to wyboru, np photo, czy notes
+  final String? photo;
+  final String? note;
 
   TransactionData({
     required this.transactionType,
@@ -17,9 +17,7 @@ class TransactionData {
     required this.date,
     required this.category,
     required this.paymentType,
-    required this.photo,
-    required this.note,
+    this.photo,
+    this.note,
   });
 }
-
-List<TransactionData> transactions = [];

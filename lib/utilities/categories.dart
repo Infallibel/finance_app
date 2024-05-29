@@ -72,4 +72,14 @@ List<Map<String, dynamic>> categories = [
     'iconColor': kColorBrown,
     'inputText': 'Petrol',
   },
+  {
+    'iconData': Icons.local_atm_outlined,
+    'iconColor': kColorBlue,
+    'inputText': 'Cash Deposit',
+  },
+  {
+    'iconData': Icons.local_atm,
+    'iconColor': kColorBlue,
+    'inputText': 'Cash Withdrawal',
+  },
 ];

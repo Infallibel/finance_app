@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import '../services/transaction_data.dart';
 import 'icon_text_row.dart';
 import 'package:finance_app/utilities/constants.dart';
 
 class TransactionDayColumn extends StatelessWidget {
-  const TransactionDayColumn({super.key, required this.day});
+  const TransactionDayColumn(
+      {super.key, required this.day, required this.transactions});
 
   final String day;
+  final List<TransactionData> transactions;
 
   @override
   Widget build(BuildContext context) {
@@ -19,36 +22,19 @@ class TransactionDayColumn extends StatelessWidget {
             style: kFontStyleLato.copyWith(color: kColorGrey2),
           ),
         ),
-        IconTextAndRow(
-          iconData: Icons.coffee_outlined,
-          iconColor: kColorBrown,
-          inputText: 'Coffee',
-          amount: -538.00,
-        ),
-        IconTextAndRow(
-          iconData: Icons.shopping_cart_outlined,
-          iconColor: kColorRed,
-          inputText: 'Grocery',
-          amount: -444.7,
-        ),
-        IconTextAndRow(
-          iconData: Icons.money_outlined,
-          iconColor: kColorGreen,
-          inputText: 'Salary',
-          amount: 26500,
-        ),
-        IconTextAndRow(
-          iconData: Icons.local_taxi_outlined,
-          iconColor: kColorYellow,
-          inputText: 'Taxi',
-          amount: -358.63,
-        ),
-        IconTextAndRow(
-          iconData: Icons.health_and_safety_outlined,
-          iconColor: kColorTurquoise,
-          inputText: 'Health',
-          amount: -25.12,
-        ),
+        ...transactions.map((transaction) {
+          return IconTextAndRow(
+            iconData: transaction.category[
+                'iconData'], // Replace with actual category icon if available
+            iconColor: transaction.category[
+                'iconColor'], // Replace with actual category color if available
+            inputText: transaction.category['inputText'],
+            transactionType: transaction.transactionType,
+            amount: transaction.transactionType == 'Expenses'
+                ? -transaction.amount
+                : transaction.amount,
+          );
+        }),
       ],
     );
   }
