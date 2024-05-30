@@ -7,7 +7,6 @@ import '../services/transaction_data.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../utilities/CubitsBlocs/month_year_cubit.dart';
 import '../widgets/pie_chart_analytics.dart';
-import '../widgets/transactions_selection.dart';
 import 'package:intl/intl.dart';
 
 class AnalyticsPage extends StatelessWidget {
@@ -41,6 +40,16 @@ class AnalyticsPage extends StatelessWidget {
                     return map;
                   });
 
+                  final sortedTransactionDays = transactionsByDay.keys.toList()
+                    ..sort((a, b) {
+                      final dateA = DateFormat('dd/MM/yyyy').parse(a);
+                      final dateB = DateFormat('dd/MM/yyyy').parse(b);
+                      return dateB.compareTo(dateA);
+                    });
+
+                  final monthBalance = transactionDataCubit.balanceForMonth(
+                      monthYearState.month, monthYearState.year);
+
                   return Column(
                     children: [
                       Padding(
@@ -73,10 +82,9 @@ class AnalyticsPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                      PieChartAnalytics(),
-                      TransactionSelection(),
-
-                      ///TODO add TransactionSelection Screen, but detach it from the other one used in AddTransaction screen
+                      PieChartAnalytics(
+                        monthBalance: monthBalance,
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(top: 16, bottom: 4.0),
                         child: Row(
@@ -85,16 +93,19 @@ class AnalyticsPage extends StatelessWidget {
                             Text('Categories',
                                 style: kFontStyleLato.copyWith(
                                     fontSize: 20, fontWeight: FontWeight.bold)),
-                            Text('- \$12500.00',
+                            Text(
+                                monthBalance < 0
+                                    ? '- \$${monthBalance.abs().toStringAsFixed(2)}'
+                                    : '\$${monthBalance.toStringAsFixed(2)}',
                                 style: kFontStyleLato.copyWith(
                                     fontSize: 20, fontWeight: FontWeight.bold))
                           ],
                         ),
                       ),
-                      ...transactionsByDay.entries.map((entry) {
+                      ...sortedTransactionDays.map((day) {
                         return TransactionDayColumn(
-                          day: entry.key,
-                          transactions: entry.value,
+                          day: day,
+                          transactions: transactionsByDay[day]!,
                         );
                       }),
                     ],

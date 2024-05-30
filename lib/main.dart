@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
             create: (context) => TransactionDataCubit(),
           ),
           BlocProvider(
-            create: (_) => MonthYearCubit(),
+            create: (context) => MonthYearCubit(),
           )
         ],
         child: MaterialApp(

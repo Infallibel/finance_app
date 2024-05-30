@@ -16,11 +16,12 @@ import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dar
 class AddTransaction extends StatelessWidget {
   AddTransaction({super.key});
 
-  String user = 'Anna';
+  final String user = 'Anna';
 
   /// TODO handle user selection (login etc.) and make it so when transaction is added it is picked automatically as a logged user
 
   final TextEditingController numberTextController = TextEditingController();
+  final FocusNode numberTextFocusNode = FocusNode();
 
   void _saveTransaction(BuildContext context) {
     final categoryState = context.read<CategoryCubit>().state;
@@ -63,8 +64,15 @@ class AddTransaction extends StatelessWidget {
     }
   }
 
+  bool _hasValue() {
+    return numberTextController.text.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_hasValue()) {
+      numberTextFocusNode.unfocus();
+    }
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: ScreenScaffold(
@@ -85,7 +93,9 @@ class AddTransaction extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const TransactionSelection(),
-                NumericalTextField(controller: numberTextController),
+                NumericalTextField(
+                  controller: numberTextController,
+                ),
                 const Divider(
                   color: kColorGrey1,
                   thickness: 1,

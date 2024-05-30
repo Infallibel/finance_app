@@ -24,4 +24,30 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
 
     return transactionsGroupedByDay;
   }
+
+  double get totalBalance {
+    double balance = 0.0;
+    for (var transaction in state) {
+      if (transaction.transactionType == 'Income') {
+        balance += transaction.amount;
+      } else if (transaction.transactionType == 'Expenses') {
+        balance -= transaction.amount;
+      }
+    }
+    return balance;
+  }
+
+  double balanceForMonth(int month, int year) {
+    double balance = 0.0;
+    for (var transaction in state) {
+      if (transaction.date.month == month && transaction.date.year == year) {
+        if (transaction.transactionType == 'Income') {
+          balance += transaction.amount;
+        } else if (transaction.transactionType == 'Expenses') {
+          balance -= transaction.amount;
+        }
+      }
+    }
+    return balance;
+  }
 }

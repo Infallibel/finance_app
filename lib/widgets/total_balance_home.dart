@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 
 class TotalBalance extends StatefulWidget {
   const TotalBalance({super.key});
@@ -19,6 +22,8 @@ class _TotalBalanceState extends State<TotalBalance> {
 
   @override
   Widget build(BuildContext context) {
+    final totalBalance = context.watch<TransactionDataCubit>().totalBalance;
+
     return Container(
       decoration: BoxDecoration(
         color: kColorLightBlueSecondary,
@@ -40,7 +45,9 @@ class _TotalBalanceState extends State<TotalBalance> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  isVisible ? '\$ 24285.56' : '*********',
+                  isVisible
+                      ? '\$ ${totalBalance.toStringAsFixed(2)}'
+                      : '*********',
                   style: kFontStyleLato.copyWith(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
