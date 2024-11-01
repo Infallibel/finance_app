@@ -12,7 +12,8 @@ class IconTextAndRow extends StatelessWidget {
       this.amount,
       this.onTap,
       this.selectionText,
-      this.transactionType});
+      this.transactionType,
+      this.trailingIcon});
 
   final IconData iconData;
   final Color iconColor;
@@ -21,6 +22,7 @@ class IconTextAndRow extends StatelessWidget {
   final VoidCallback? onTap;
   final String? selectionText;
   final String? transactionType;
+  final IconData? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +54,8 @@ class IconTextAndRow extends StatelessWidget {
                           ),
                         ],
                       )
-                    : const Icon(
-                        Icons.chevron_right_outlined,
+                    : Icon(
+                        trailingIcon ?? Icons.chevron_right_outlined,
                         size: 30,
                         color: kColorGrey1,
                       ),

@@ -1,3 +1,4 @@
+import 'package:d_chart/commons/data_model.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/transactions_day_column.dart';
 import 'package:flutter/material.dart';
@@ -25,21 +26,55 @@ class AnalyticsPage extends StatelessWidget {
                 builder: (context, monthYearState) {
                   final transactionDataCubit =
                       context.watch<TransactionDataCubit>();
-                  final transactionsByDay = transactionDataCubit.state
-                      .where((transaction) =>
-                          transaction.date.month == monthYearState.month &&
-                          transaction.date.year == monthYearState.year)
-                      .fold<Map<String, List<TransactionData>>>({},
-                          (map, transaction) {
-                    final day =
-                        "${transaction.date.day}/${transaction.date.month}/${transaction.date.year}";
-                    if (!map.containsKey(day)) {
-                      map[day] = [];
-                    }
-                    map[day]!.add(transaction);
-                    return map;
-                  });
 
+                  final transactions = transactionDataCubit.state.where(
+                      (transaction) =>
+                          transaction.date.month == monthYearState.month &&
+                          transaction.date.year == monthYearState.year);
+
+                  final transactionsByCategory = <String, double>{};
+                  final categoryColors = <String, Color>{};
+
+                  final expenses = transactions.where((transaction) =>
+                      transaction.transactionType == 'Expenses');
+
+                  for (var transaction in expenses) {
+                    final category = transaction.category['inputText'];
+                    final color = transaction.category['iconColor'];
+                    transactionsByCategory.update(
+                      category,
+                      (total) => total + transaction.amount,
+                      ifAbsent: () => transaction.amount,
+                    );
+                    categoryColors[category] = color;
+                  }
+
+                  final ordinalDataList = transactionsByCategory.entries.map(
+                    (entry) {
+                      return OrdinalData(
+                        domain: entry.key,
+                        measure: entry.value,
+                        color: categoryColors[entry.key]!,
+                      );
+                    },
+                  ).toList();
+
+                  // Group transactions by day for display
+                  final transactionsByDay =
+                      transactions.fold<Map<String, List<TransactionData>>>(
+                    {},
+                    (map, transaction) {
+                      final day =
+                          "${transaction.date.day}/${transaction.date.month}/${transaction.date.year}";
+                      if (!map.containsKey(day)) {
+                        map[day] = [];
+                      }
+                      map[day]!.add(transaction);
+                      return map;
+                    },
+                  );
+
+                  // Sort the transaction days
                   final sortedTransactionDays = transactionsByDay.keys.toList()
                     ..sort((a, b) {
                       final dateA = DateFormat('dd/MM/yyyy').parse(a);
@@ -84,6 +119,7 @@ class AnalyticsPage extends StatelessWidget {
                       ),
                       PieChartAnalytics(
                         monthBalance: monthBalance,
+                        ordinalDataList: ordinalDataList,
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 16, bottom: 4.0),

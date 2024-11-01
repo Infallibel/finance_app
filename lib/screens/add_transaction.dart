@@ -56,10 +56,9 @@ class AddTransaction extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-          'Please fill all the details',
-          textAlign: TextAlign.center,
-        )),
+          content:
+              Text('Please fill all the details', textAlign: TextAlign.center),
+        ),
       );
     }
   }

@@ -8,46 +8,52 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ScreenScaffold(
+    return ScreenScaffold(
       appBarTitle: 'Settings',
       scaffoldBody: Padding(
-        padding: EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 48),
+        padding:
+            const EdgeInsets.only(top: 16.0, left: 16, right: 16, bottom: 48),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <IconTextAndRow>[
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.tune_outlined,
                 iconColor: kColorBlue,
                 inputText: 'General'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.person_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Accounts'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.attach_money_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Currency'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.notifications_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Notifications'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.folder_copy_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Categories'),
             IconTextAndRow(
-                iconData: Icons.contrast_outlined,
-                iconColor: kColorBlue,
-                inputText: 'App Theme'),
-            IconTextAndRow(
+              iconData: Icons.contrast_outlined,
+              iconColor: kColorBlue,
+              inputText: 'App Theme',
+              trailingIcon: Icons.dark_mode_outlined,
+              onTap: () {
+                ///TODO change the app theme and Icon to dark mode/light mode
+              },
+            ),
+            const IconTextAndRow(
                 iconData: Icons.lock_outline,
                 iconColor: kColorBlue,
                 inputText: 'Security'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.privacy_tip_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Privacy'),
-            IconTextAndRow(
+            const IconTextAndRow(
                 iconData: Icons.logout_outlined,
                 iconColor: kColorGrey1,
                 inputText: 'Log out'),

@@ -5,15 +5,14 @@ import 'package:flutter/material.dart';
 import '../utilities/constants.dart';
 
 class PieChartAnalytics extends StatelessWidget {
-  PieChartAnalytics({super.key, required this.monthBalance});
+  const PieChartAnalytics({
+    super.key,
+    required this.monthBalance,
+    required this.ordinalDataList,
+  });
 
   final double monthBalance;
-  final List<OrdinalData> ordinalDataList = [
-    OrdinalData(domain: 'Coffee', measure: 538.00, color: kColorBrown),
-    OrdinalData(domain: 'Grocery', measure: 444.70, color: kColorRed),
-    OrdinalData(domain: 'Taxi', measure: 358.63, color: kColorYellow),
-    OrdinalData(domain: 'Health', measure: 25.12, color: kColorTurquoise),
-  ];
+  final List<OrdinalData> ordinalDataList;
 
   @override
   Widget build(BuildContext context) {

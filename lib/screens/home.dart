@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
                   )
                 ],
               ),
-              Icon(
+              const Icon(
                 Icons.notification_add_outlined,
 
                 ///albo Icons.notification_add_outlined w zaleznosci czy jest notification nowe
@@ -128,22 +128,19 @@ class HomePage extends StatelessWidget {
                     ),
                   );
                 },
-                child: Container(
-                  color: kColorWhite,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'All Transactions',
-                        style: kFontStyleLato.copyWith(
-                            color: kColorBlue, fontSize: 16),
-                      ),
-                      const Icon(
-                        Icons.chevron_right_outlined,
-                        color: kColorBlue,
-                      )
-                    ],
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'All Transactions',
+                      style: kFontStyleLato.copyWith(
+                          color: kColorBlue, fontSize: 16),
+                    ),
+                    const Icon(
+                      Icons.chevron_right_outlined,
+                      color: kColorBlue,
+                    )
+                  ],
                 ),
               ),
             )
