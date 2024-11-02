@@ -1,6 +1,8 @@
+import 'package:finance_app/utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/icon_with_border.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SavingsGoalRow extends StatelessWidget {
   const SavingsGoalRow(
@@ -29,37 +31,58 @@ class SavingsGoalRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.only(left: 16),
               width: 250,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        goalName,
+              child: BlocBuilder<CurrencyCubit, CurrencyState>(
+                builder: (context, state) {
+                  String symbol = '\$';
+                  bool symbolBefore = true;
 
-                        ///add max length of signs
-                        style: kFontStyleLato.copyWith(fontSize: 16),
+                  if (state is CurrencySelected) {
+                    symbol = state.currency.values.first;
+
+                    symbolBefore = !['€', 'CHF', 'zł'].contains(symbol);
+                  }
+
+                  String formattedBalanceAmount = symbolBefore
+                      ? '$symbol$goalAmount'
+                      : '$goalAmount $symbol';
+
+                  String formattedBalanceAccumulated = symbolBefore
+                      ? '$symbol$goalAccumulated'
+                      : '$goalAccumulated $symbol';
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            goalName,
+
+                            ///add max length of signs
+                            style: kFontStyleLato.copyWith(fontSize: 16),
+                          ),
+                          Text(
+                            formattedBalanceAmount,
+                            style: kFontStyleLato.copyWith(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                      LinearProgressIndicator(
+                        borderRadius: BorderRadius.circular(2),
+                        minHeight: 4,
+                        value: goalAccumulated / goalAmount,
+                        color: kColorBlue,
+                        backgroundColor: kColorGrey1,
                       ),
                       Text(
-                        '\$$goalAmount',
-                        style: kFontStyleLato.copyWith(fontSize: 16),
+                        formattedBalanceAccumulated,
+                        style: kFontStyleLato.copyWith(
+                            color: kColorGrey1, fontSize: 12),
                       ),
                     ],
-                  ),
-                  LinearProgressIndicator(
-                    borderRadius: BorderRadius.circular(2),
-                    minHeight: 4,
-                    value: goalAccumulated / goalAmount,
-                    color: kColorBlue,
-                    backgroundColor: kColorGrey1,
-                  ),
-                  Text(
-                    '\$$goalAccumulated',
-                    style: kFontStyleLato.copyWith(
-                        color: kColorGrey1, fontSize: 12),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),

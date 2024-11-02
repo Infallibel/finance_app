@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/transaction_data.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../utilities/CubitsBlocs/month_year_cubit.dart';
+import '../widgets/formatted_balance_text.dart';
 import '../widgets/pie_chart_analytics.dart';
 import 'package:intl/intl.dart';
 
@@ -126,15 +127,12 @@ class AnalyticsPage extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Categories',
-                                style: kFontStyleLato.copyWith(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
                             Text(
-                                monthBalance < 0
-                                    ? '- \$${monthBalance.abs().toStringAsFixed(2)}'
-                                    : '\$${monthBalance.toStringAsFixed(2)}',
-                                style: kFontStyleLato.copyWith(
-                                    fontSize: 20, fontWeight: FontWeight.bold))
+                              'Categories',
+                              style: kFontStyleLato.copyWith(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
+                            FormattedBalanceText(balance: monthBalance),
                           ],
                         ),
                       ),

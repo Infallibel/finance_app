@@ -1,3 +1,4 @@
+import 'package:finance_app/screens/add_new_goal.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
@@ -39,9 +40,12 @@ class SavingsPage extends StatelessWidget {
               ),
             ),
 
-            /// make it so textbutton is higher up on screen when only a few savingsgoalrows are added if possible
+            ///TODO make it so textButton is higher up on screen when only a few savingsGoalRows are added if possible
             TextButtonModel(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => AddNewGoal()));
+              },
               backgroundColor: kColorLightBlueSecondary,
               overlayColor: kColorLightBlue,
               buttonTextColor: kColorBlue,

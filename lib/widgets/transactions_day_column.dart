@@ -24,10 +24,8 @@ class TransactionDayColumn extends StatelessWidget {
         ),
         ...transactions.map((transaction) {
           return IconTextAndRow(
-            iconData: transaction.category[
-                'iconData'], // Replace with actual category icon if available
-            iconColor: transaction.category[
-                'iconColor'], // Replace with actual category color if available
+            iconData: transaction.category['iconData'],
+            iconColor: transaction.category['iconColor'],
             inputText: transaction.category['inputText'],
             transactionType: transaction.transactionType,
             amount: transaction.transactionType == 'Expenses'

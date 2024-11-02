@@ -2,6 +2,9 @@ import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/icon_text_row.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -24,10 +27,14 @@ class SettingsPage extends StatelessWidget {
                 iconData: Icons.person_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Accounts'),
-            const IconTextAndRow(
-                iconData: Icons.attach_money_outlined,
-                iconColor: kColorBlue,
-                inputText: 'Currency'),
+            IconTextAndRow(
+              iconData: Icons.attach_money_outlined,
+              iconColor: kColorBlue,
+              inputText: 'Currency',
+              onTap: () {
+                context.read<CurrencyCubit>().showCurrencyOptions(context);
+              },
+            ),
             const IconTextAndRow(
                 iconData: Icons.notifications_outlined,
                 iconColor: kColorBlue,
@@ -42,7 +49,7 @@ class SettingsPage extends StatelessWidget {
               inputText: 'App Theme',
               trailingIcon: Icons.dark_mode_outlined,
               onTap: () {
-                ///TODO change the app theme and Icon to dark mode/light mode
+                ///TODO toggle app theme
               },
             ),
             const IconTextAndRow(

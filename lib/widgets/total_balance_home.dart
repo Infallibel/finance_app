@@ -1,3 +1,4 @@
+import 'package:finance_app/utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,14 +45,29 @@ class _TotalBalanceState extends State<TotalBalance> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  isVisible
-                      ? '\$ ${totalBalance.toStringAsFixed(2)}'
-                      : '*********',
-                  style: kFontStyleLato.copyWith(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                BlocBuilder<CurrencyCubit, CurrencyState>(
+                  builder: (context, state) {
+                    String symbol = '\$';
+                    bool symbolBefore = true;
+
+                    if (state is CurrencySelected) {
+                      symbol = state.currency.values.first;
+
+                      symbolBefore = !['€', 'CHF', 'zł'].contains(symbol);
+                    }
+
+                    String formattedBalance = symbolBefore
+                        ? '$symbol ${totalBalance.toStringAsFixed(2)}'
+                        : '${totalBalance.toStringAsFixed(2)} $symbol';
+
+                    return Text(
+                      isVisible ? formattedBalance : '*********',
+                      style: kFontStyleLato.copyWith(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
                 GestureDetector(
                   onTap: toggleVisibility,

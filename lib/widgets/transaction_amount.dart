@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 
 class TransactionAmount extends StatelessWidget {
   const TransactionAmount(
@@ -36,23 +39,45 @@ class TransactionAmount extends StatelessWidget {
         fractionPartColor = kColorGrey2;
     }
 
-    return Row(
-      children: [
-        Text(
-          '\$$wholePart',
-          style: kFontStyleLato.copyWith(
-            fontWeight: FontWeight.bold,
-            color: wholePartColor,
-          ),
-        ),
-        Text(
-          '.$fractionPart',
-          style: kFontStyleLato.copyWith(
-            fontWeight: FontWeight.bold,
-            color: fractionPartColor,
-          ),
-        )
-      ],
+    return BlocBuilder<CurrencyCubit, CurrencyState>(
+      builder: (context, state) {
+        String symbol = '\$';
+        bool symbolBefore = true;
+
+        if (state is CurrencySelected) {
+          symbol = state.currency.values.first;
+
+          symbolBefore = !['€', 'CHF', 'zł'].contains(symbol);
+        }
+        return Row(
+          children: [
+            Text(symbolBefore ? symbol : '',
+                style: kFontStyleLato.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: wholePartColor,
+                )),
+            Text(
+              wholePart,
+              style: kFontStyleLato.copyWith(
+                fontWeight: FontWeight.bold,
+                color: wholePartColor,
+              ),
+            ),
+            Text(
+              '.$fractionPart ',
+              style: kFontStyleLato.copyWith(
+                fontWeight: FontWeight.bold,
+                color: fractionPartColor,
+              ),
+            ),
+            Text(symbolBefore ? '' : symbol,
+                style: kFontStyleLato.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: wholePartColor,
+                )),
+          ],
+        );
+      },
     );
   }
 }

@@ -4,6 +4,8 @@ import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/payment_t
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/transaction_type_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/month_year_cubit.dart';
+import 'package:finance_app/utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
+import 'package:finance_app/utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +44,13 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => MonthYearCubit(),
-          )
+          ),
+          BlocProvider(
+            create: (context) => CurrencyCubit(),
+          ),
+          BlocProvider(
+            create: (context) => GoalDataCubit(),
+          ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
