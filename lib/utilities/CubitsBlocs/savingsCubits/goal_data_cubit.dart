@@ -16,15 +16,10 @@ class GoalDataLoaded extends GoalDataState {
 class GoalDataCubit extends Cubit<GoalDataState> {
   GoalDataCubit() : super(GoalDataInitial());
 
-  // List to store goals
   final List<SavingsGoalData> _goals = [];
 
-  // Method to add a new goal
   void addGoal(SavingsGoalData goal) {
     _goals.add(goal);
-    emit(GoalDataLoaded(
-        List.from(_goals))); // Emit a new state with updated goals
+    emit(GoalDataLoaded(List.from(_goals)));
   }
-
-// Optional: Additional methods to retrieve goals or clear them
 }

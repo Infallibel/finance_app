@@ -4,11 +4,11 @@ import 'package:finance_app/widgets/transactions_day_column.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../services/transaction_data.dart';
-import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
-import '../utilities/CubitsBlocs/month_year_cubit.dart';
-import '../widgets/formatted_balance_text.dart';
-import '../widgets/pie_chart_analytics.dart';
+import '../../services/transaction_data.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
+import '../../utilities/CubitsBlocs/month_year_cubit.dart';
+import '../../widgets/formatted_balance_text.dart';
+import '../../widgets/pie_chart_analytics.dart';
 import 'package:intl/intl.dart';
 
 class AnalyticsPage extends StatelessWidget {

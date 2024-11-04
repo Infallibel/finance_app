@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../utilities/CubitsBlocs/addTransactioncubits/transaction_type_cubit.dart';
-import '../utilities/constants.dart';
-import '../widgets/screen_scaffold.dart';
-import '../widgets/transactions_day_column.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_type_cubit.dart';
+import '../../utilities/constants.dart';
+import '../../widgets/screen_scaffold.dart';
+import '../../widgets/transactions_day_column.dart';
 
 class AllTransactionsPage extends StatelessWidget {
   const AllTransactionsPage({super.key});

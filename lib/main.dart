@@ -1,5 +1,6 @@
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
+import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/note_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/payment_type_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/transaction_type_cubit.dart';
@@ -50,6 +51,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => GoalDataCubit(),
+          ),
+          BlocProvider(
+            create: (context) => NotesCubit(),
           ),
         ],
         child: MaterialApp(

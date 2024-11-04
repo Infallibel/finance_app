@@ -13,14 +13,14 @@ class SavingsGoalRow extends StatelessWidget {
       required this.iconData});
 
   final String goalName;
-  final int goalAmount;
-  final int goalAccumulated;
+  final double goalAmount;
+  final double goalAccumulated;
   final IconData iconData;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
           IconWithBorder(

@@ -11,6 +11,7 @@ import 'package:finance_app/widgets/numerical_text_field.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../utilities/CubitsBlocs/addTransactioncubits/note_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 
 class AddTransaction extends StatelessWidget {
@@ -21,6 +22,7 @@ class AddTransaction extends StatelessWidget {
   /// TODO handle user selection (login etc.) and make it so when transaction is added it is picked automatically as a logged user
 
   final TextEditingController numberTextController = TextEditingController();
+  final TextEditingController noteController = TextEditingController();
   final FocusNode numberTextFocusNode = FocusNode();
 
   void _saveTransaction(BuildContext context) {
@@ -28,7 +30,18 @@ class AddTransaction extends StatelessWidget {
     final dateState = context.read<DateCubit>().state;
     final paymentTypeState = context.read<PaymentTypeCubit>().state;
     final transactionTypeState = context.read<TransactionTypeCubit>().state;
+    final notesState = context.read<NotesCubit>().state;
 
+    final amount = double.tryParse(numberTextController.text) ?? 0.0;
+    if (amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid amount greater than 0',
+              textAlign: TextAlign.center),
+        ),
+      );
+      return;
+    }
     if (categoryState is CategorySelected &&
         dateState is DateSelected &&
         paymentTypeState is PaymentTypeSelected &&
@@ -40,6 +53,7 @@ class AddTransaction extends StatelessWidget {
         paymentType: paymentTypeState.paymentType,
         transactionType: transactionTypeState.transactionType,
         user: user,
+        note: notesState.note.isNotEmpty ? notesState.note : null,
       );
 
       context.read<TransactionDataCubit>().addTransaction(transactionData);
@@ -50,6 +64,7 @@ class AddTransaction extends StatelessWidget {
       context.read<PaymentTypeCubit>().clearPaymentType();
       context.read<TransactionTypeCubit>().clearTransactionType();
       numberTextController.clear();
+      context.read<NotesCubit>().updateNote('');
 
       // Pop the screen
       Navigator.of(context).pop();
@@ -63,13 +78,9 @@ class AddTransaction extends StatelessWidget {
     }
   }
 
-  bool _hasValue() {
-    return numberTextController.text.isNotEmpty;
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (!_hasValue()) {
+    if (numberTextController.text.isEmpty) {
       numberTextFocusNode.unfocus();
     }
     return GestureDetector(
@@ -179,12 +190,43 @@ class AddTransaction extends StatelessWidget {
                         inputText: 'Photo'),
 
                     ///TODO make it so taking photos is possible
-                    const IconTextAndRow(
-                        iconData: Icons.note_outlined,
-                        iconColor: kColorGrey1,
-                        inputText: 'Note'),
-
-                    ///TODO make it so taking notes is possible
+                    BlocBuilder<NotesCubit, NotesState>(
+                        builder: (context, notesState) {
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              context.read<NotesCubit>().toggleVisibility();
+                            },
+                            child: IconTextAndRow(
+                              iconData: Icons.note_outlined,
+                              iconColor: kColorGrey1,
+                              inputText: notesState.isVisible
+                                  ? 'Hide Note'
+                                  : 'Add Note',
+                              selectionText: notesState.note.isNotEmpty
+                                  ? 'Added'
+                                  : 'Not Added',
+                            ),
+                          ),
+                          if (notesState.isVisible)
+                            TextField(
+                              controller: noteController,
+                              onChanged: (value) {
+                                context.read<NotesCubit>().updateNote(value);
+                              },
+                              decoration: const InputDecoration(
+                                focusColor: kColorBlue,
+                                hintText: 'Enter your note here',
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: kColorBlue)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: kColorBlue)),
+                              ),
+                            ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ],

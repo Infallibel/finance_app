@@ -6,8 +6,9 @@ import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:finance_app/widgets/numerical_text_field.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
-import '../utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
+import '../../utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
+import '../../utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
 
 class AddNewGoal extends StatelessWidget {
   AddNewGoal({super.key});
@@ -20,7 +21,6 @@ class AddNewGoal extends StatelessWidget {
   void _saveGoal(BuildContext context) {
     final dateState = context.read<DateCubit>().state;
 
-    // Parse amounts and perform validation check
     double goalAmount = double.tryParse(goalAmountController.text) ?? 0.0;
     double accumulatedAmount =
         double.tryParse(accumulatedAmountController.text) ?? 0.0;
@@ -30,7 +30,6 @@ class AddNewGoal extends StatelessWidget {
         accumulatedAmountController.text.isNotEmpty &&
         dateState is DateSelected) {
       if (accumulatedAmount > goalAmount) {
-        // Show error if accumulated amount is higher than goal amount
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -39,7 +38,7 @@ class AddNewGoal extends StatelessWidget {
             ),
           ),
         );
-        return; // Exit the function to prevent saving
+        return;
       }
 
       final goalData = SavingsGoalData(
@@ -47,21 +46,20 @@ class AddNewGoal extends StatelessWidget {
         targetAmount: goalAmount,
         accumulatedAmount: accumulatedAmount,
         targetDate: dateState.date,
-        user: 'Anna', // Placeholder, to be replaced with the current user
+        user: 'Anna',
       );
 
       context.read<GoalDataCubit>().addGoal(goalData);
 
-      // Reset the form
+      context.read<TransactionDataCubit>().deductFromBalance(accumulatedAmount);
+
       goalNameController.clear();
       goalAmountController.clear();
       accumulatedAmountController.clear();
       context.read<DateCubit>().clearDate();
 
-      // Pop the screen
       Navigator.of(context).pop();
     } else {
-      // Show error if required fields are missing
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -94,7 +92,6 @@ class AddNewGoal extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Goal Name TextField (String Input)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: TextField(

@@ -7,8 +7,8 @@ import 'package:finance_app/widgets/transactions_day_column.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../services/transaction_data.dart';
-import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
+import '../../services/transaction_data.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'all_transactions.dart';
 
 class HomePage extends StatelessWidget {

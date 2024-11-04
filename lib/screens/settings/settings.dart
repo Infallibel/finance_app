@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
+import '../../utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

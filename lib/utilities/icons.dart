@@ -42,6 +42,7 @@ List<IconData> icons = [
   Icons.folder_copy_outlined,
   Icons.attach_money_outlined,
   Icons.search_outlined,
+  Icons.info_outline,
 
   Icons.settings_outlined,
   Icons.settings,

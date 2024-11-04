@@ -1,8 +1,8 @@
 import 'package:finance_app/screens/add_transaction.dart';
-import 'package:finance_app/screens/analytics.dart';
-import 'package:finance_app/screens/home.dart';
-import 'package:finance_app/screens/savings.dart';
-import 'package:finance_app/screens/settings.dart';
+import 'package:finance_app/screens/analytics/analytics.dart';
+import 'package:finance_app/screens/home/home.dart';
+import 'package:finance_app/screens/savings/savings.dart';
+import 'package:finance_app/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/utilities/constants.dart';
 
