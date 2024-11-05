@@ -3,12 +3,11 @@ import '../../../services/transaction_data.dart';
 
 class TransactionDataCubit extends Cubit<List<TransactionData>> {
   TransactionDataCubit() : super([]) {
-    _calculateInitialBalance(); // Initialize balance from existing transactions, if any
+    _calculateInitialBalance();
   }
 
   double _balance = 0.0;
 
-  // Initializes _balance based on existing transactions
   void _calculateInitialBalance() {
     _balance = state.fold<double>(0.0, (currentBalance, transaction) {
       return transaction.transactionType == 'Income'
@@ -17,15 +16,12 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
     });
   }
 
-  // Getter for total balance, returns current balance
   double get totalBalance => _balance;
 
-  // Method to add a new transaction
   void addTransaction(TransactionData transactionData) {
-    state.add(transactionData); // Adds transaction to the state list
-    emit(List.from(state)); // Emits updated state list for listeners
+    state.add(transactionData);
+    emit(List.from(state));
 
-    // Update balance based on the type of transaction
     if (transactionData.transactionType == 'Income') {
       _balance += transactionData.amount;
     } else if (transactionData.transactionType == 'Expenses') {
@@ -33,13 +29,35 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
     }
   }
 
-  // Method to deduct a specified amount directly from the balance
   void deductFromBalance(double amount) {
-    _balance -= amount; // Deducts amount from _balance
-    emit(List.from(state)); // Emits updated state to notify listeners
+    _balance -= amount;
+    emit(List.from(state));
   }
 
-  // Groups transactions by day for easier access and display
+  void updateTransaction(TransactionData updatedTransaction) {
+    final index = state.indexWhere((t) => t.id == updatedTransaction.id);
+    if (index != -1) {
+      final oldTransaction = state[index];
+
+      // Update balance by removing the old amount and adding the updated amount
+      if (oldTransaction.transactionType == 'Income') {
+        _balance -= oldTransaction.amount;
+      } else {
+        _balance += oldTransaction.amount;
+      }
+
+      if (updatedTransaction.transactionType == 'Income') {
+        _balance += updatedTransaction.amount;
+      } else {
+        _balance -= updatedTransaction.amount;
+      }
+
+      // Replace the transaction in the state list
+      state[index] = updatedTransaction;
+      emit(List.from(state));
+    }
+  }
+
   Map<String, List<TransactionData>> get transactionsByDay {
     var transactionsGroupedByDay = <String, List<TransactionData>>{};
 
@@ -55,7 +73,6 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
     return transactionsGroupedByDay;
   }
 
-  // Calculates balance for a specific month and year
   double balanceForMonth(int month, int year) {
     double balance = 0.0;
     for (var transaction in state) {

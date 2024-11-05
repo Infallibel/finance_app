@@ -1,5 +1,5 @@
-import 'package:d_chart/commons/config_render.dart';
-import 'package:d_chart/commons/data_model.dart';
+import 'package:d_chart/commons/config_render/config_render.dart';
+import 'package:d_chart/commons/data_model/data_model.dart';
 import 'package:d_chart/ordinal/pie.dart';
 import 'package:finance_app/widgets/formatted_balance_text.dart';
 import 'package:flutter/material.dart';

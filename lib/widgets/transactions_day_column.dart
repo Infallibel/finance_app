@@ -1,3 +1,4 @@
+import 'package:finance_app/screens/edit_transaction.dart';
 import 'package:flutter/material.dart';
 import '../services/transaction_data.dart';
 import 'icon_text_row.dart';
@@ -31,6 +32,15 @@ class TransactionDayColumn extends StatelessWidget {
             amount: transaction.transactionType == 'Expenses'
                 ? -transaction.amount
                 : transaction.amount,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditTransactionPage(transactionData: transaction),
+                ),
+              );
+            },
           );
         }),
       ],

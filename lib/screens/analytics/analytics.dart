@@ -1,4 +1,4 @@
-import 'package:d_chart/commons/data_model.dart';
+import 'package:d_chart/commons/data_model/data_model.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/transactions_day_column.dart';
 import 'package:flutter/material.dart';

@@ -31,8 +31,8 @@ class _BottomBarState extends State<BottomBar> {
         elevation: 0,
         shape: const CircleBorder(),
         onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => AddTransaction()));
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => AddTransactionPage()));
         },
         child: const Icon(
           Icons.add,

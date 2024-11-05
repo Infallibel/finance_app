@@ -11,11 +11,12 @@ import 'package:finance_app/widgets/numerical_text_field.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/note_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 
-class AddTransaction extends StatelessWidget {
-  AddTransaction({super.key});
+class AddTransactionPage extends StatelessWidget {
+  AddTransactionPage({super.key});
 
   final String user = 'Anna';
 
@@ -46,7 +47,9 @@ class AddTransaction extends StatelessWidget {
         dateState is DateSelected &&
         paymentTypeState is PaymentTypeSelected &&
         transactionTypeState is TransactionTypeSelected) {
+      final String transactionId = const Uuid().v4();
       final transactionData = TransactionData(
+        id: transactionId,
         category: categoryState.category,
         amount: double.tryParse(numberTextController.text) ?? 0.0,
         date: dateState.date,

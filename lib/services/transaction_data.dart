@@ -1,4 +1,5 @@
 class TransactionData {
+  final String id;
   final String transactionType;
   final double amount;
   final String user;
@@ -11,6 +12,7 @@ class TransactionData {
   final String? note;
 
   TransactionData({
+    required this.id,
     required this.transactionType,
     required this.amount,
     required this.user,
@@ -20,4 +22,28 @@ class TransactionData {
     this.photo,
     this.note,
   });
+  // Create a copy of TransactionData with updated fields
+  TransactionData copyWith({
+    String? id,
+    Map<String, dynamic>? category,
+    double? amount,
+    DateTime? date,
+    Map<String, dynamic>? paymentType,
+    String? transactionType,
+    String? user,
+    String? note,
+    String? photo,
+  }) {
+    return TransactionData(
+      id: id ?? this.id,
+      category: category ?? this.category,
+      amount: amount ?? this.amount,
+      date: date ?? this.date,
+      paymentType: paymentType ?? this.paymentType,
+      transactionType: transactionType ?? this.transactionType,
+      user: user ?? this.user,
+      note: note ?? this.note,
+      photo: photo ?? this.photo,
+    );
+  }
 }
