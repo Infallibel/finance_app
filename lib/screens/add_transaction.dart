@@ -239,13 +239,14 @@ class AddTransactionPage extends StatelessWidget {
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: TextButtonModel(
-              onPressed: () {
-                _saveTransaction(context);
-              },
-              backgroundColor: kColorBlue,
-              overlayColor: kColorLightBlue,
-              buttonText: 'Save',
-              buttonTextColor: kColorWhite),
+            onPressed: () {
+              _saveTransaction(context);
+            },
+            backgroundColor: kColorBlue,
+            overlayColor: kColorLightBlue,
+            buttonText: 'Save',
+            buttonTextColor: kColorWhite,
+          ),
         ),
       ),
     );

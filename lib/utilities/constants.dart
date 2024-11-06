@@ -13,6 +13,7 @@ const kColorLightBlue = Color(0xff77a5ff);
 
 //attention
 const kColorWarning = Color(0xffff5c5c);
+const kColorLightWarning = Color(0xffff7a7a);
 const kColorSuccess = Color(0xff4DCF2C);
 
 //secondary

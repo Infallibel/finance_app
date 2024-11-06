@@ -8,18 +8,20 @@ class TextButtonModel extends StatelessWidget {
       required this.overlayColor,
       required this.buttonText,
       required this.buttonTextColor,
-      required this.onPressed});
+      required this.onPressed,
+      this.bottomPadding = 24});
 
   final Color backgroundColor;
   final Color overlayColor;
   final Color buttonTextColor;
   final String buttonText;
   final VoidCallback onPressed;
+  final double bottomPadding;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8, bottom: 24),
+      padding: EdgeInsets.only(top: 8, bottom: bottomPadding),
       child: TextButton(
         style: ButtonStyle(
           shape: WidgetStateProperty.all(RoundedRectangleBorder(

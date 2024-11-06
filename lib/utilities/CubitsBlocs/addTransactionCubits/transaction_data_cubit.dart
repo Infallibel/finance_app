@@ -39,7 +39,6 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
     if (index != -1) {
       final oldTransaction = state[index];
 
-      // Update balance by removing the old amount and adding the updated amount
       if (oldTransaction.transactionType == 'Income') {
         _balance -= oldTransaction.amount;
       } else {
@@ -56,6 +55,12 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
       state[index] = updatedTransaction;
       emit(List.from(state));
     }
+  }
+
+  void deleteTransaction(String transactionId) {
+    state.removeWhere((transaction) => transaction.id == transactionId);
+    emit(List.from(state));
+    _calculateInitialBalance();
   }
 
   Map<String, List<TransactionData>> get transactionsByDay {
