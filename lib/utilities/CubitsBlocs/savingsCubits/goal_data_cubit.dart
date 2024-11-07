@@ -22,4 +22,12 @@ class GoalDataCubit extends Cubit<GoalDataState> {
     _goals.add(goal);
     emit(GoalDataLoaded(List.from(_goals)));
   }
+
+  void updateGoal(SavingsGoalData oldGoal, SavingsGoalData updatedGoal) {
+    final index = _goals.indexOf(oldGoal);
+    if (index != -1) {
+      _goals[index] = updatedGoal;
+      emit(GoalDataLoaded(List.from(_goals)));
+    }
+  }
 }

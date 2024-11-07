@@ -7,6 +7,9 @@ import 'package:finance_app/widgets/savings_goal_row.dart';
 import 'package:finance_app/widgets/text_button_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
+import 'edit_goal.dart';
+
 class SavingsPage extends StatelessWidget {
   const SavingsPage({super.key});
 
@@ -90,12 +93,38 @@ class SavingsPage extends StatelessWidget {
             ),
             Expanded(
               child: BlocBuilder<GoalDataCubit, GoalDataState>(
-                  builder: (context, state) {
-                if (state is GoalDataLoaded) {
-                  final goals = state.goals;
-
-                  // Check if there are any goals added
-                  if (goals.isEmpty) {
+                builder: (context, state) {
+                  if (state is GoalDataLoaded) {
+                    final goals = state.goals;
+                    if (goals.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No goals added yet.',
+                          style: kFontStyleLato.copyWith(color: kColorGrey2),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: goals.length,
+                      itemBuilder: (context, index) {
+                        final goal = goals[index];
+                        return SavingsGoalRow(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => BlocProvider(
+                                create: (context) => NotesCubit(),
+                                child: EditGoal(goal: goal),
+                              ),
+                            ));
+                          },
+                          iconData: Icons.track_changes,
+                          goalName: goal.name,
+                          goalAmount: goal.targetAmount,
+                          goalAccumulated: goal.accumulatedAmount,
+                        );
+                      },
+                    );
+                  } else {
                     return Center(
                       child: Text(
                         'No goals added yet.',
@@ -103,35 +132,19 @@ class SavingsPage extends StatelessWidget {
                       ),
                     );
                   }
-                  return ListView.builder(
-                    itemCount: goals.length,
-                    itemBuilder: (context, index) {
-                      final goal = goals[index];
-
-                      return SavingsGoalRow(
-                        iconData: Icons.track_changes,
-                        goalName: goal.name,
-                        goalAmount: goal.targetAmount,
-                        goalAccumulated: goal.accumulatedAmount,
-                      );
-                    },
-                  );
-                } else {
-                  return Center(
-                    child: Text(
-                      'No goals added yet.',
-                      style: kFontStyleLato.copyWith(color: kColorGrey2),
-                    ),
-                  );
-                }
-              }),
+                },
+              ),
             ),
 
             ///TODO make it so textButton is higher up on screen when only a few savingsGoalRows are added if possible
             TextButtonModel(
               onPressed: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => AddNewGoal()));
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => NotesCubit(),
+                    child: AddNewGoal(),
+                  ),
+                ));
               },
               backgroundColor: kColorLightBlueSecondary,
               overlayColor: kColorLightBlue,

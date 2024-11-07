@@ -51,7 +51,6 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
         _balance -= updatedTransaction.amount;
       }
 
-      // Replace the transaction in the state list
       state[index] = updatedTransaction;
       emit(List.from(state));
     }

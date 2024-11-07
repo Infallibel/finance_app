@@ -1,26 +1,33 @@
-import 'package:finance_app/utilities/constants.dart';
-import 'package:finance_app/widgets/icon_text_row.dart';
-import 'package:finance_app/widgets/text_button_model.dart';
 import 'package:flutter/material.dart';
-import 'package:finance_app/widgets/screen_scaffold.dart';
-import 'package:finance_app/widgets/numerical_text_field.dart';
-import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../utilities/CubitsBlocs/addTransactionCubits/date_cubit.dart';
 import '../../utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
-import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
+import '../../utilities/constants.dart';
+import '../../widgets/icon_text_row.dart';
+import '../../widgets/numerical_text_field.dart';
+import '../../widgets/savings_goal_row.dart';
+import '../../widgets/screen_scaffold.dart';
+import '../../widgets/text_button_model.dart';
 
-class AddNewGoal extends StatelessWidget {
-  AddNewGoal({super.key});
+class EditGoal extends StatelessWidget {
+  final SavingsGoalData goal;
+  final TextEditingController goalNameController;
+  final TextEditingController goalAmountController;
+  final TextEditingController accumulatedAmountController;
+  final TextEditingController noteController;
 
-  final TextEditingController goalNameController = TextEditingController();
-  final TextEditingController goalAmountController = TextEditingController();
-  final TextEditingController accumulatedAmountController =
-      TextEditingController();
-  final TextEditingController noteController = TextEditingController();
+  EditGoal({super.key, required this.goal})
+      : goalNameController = TextEditingController(text: goal.name),
+        goalAmountController =
+            TextEditingController(text: goal.targetAmount.toString()),
+        accumulatedAmountController =
+            TextEditingController(text: goal.accumulatedAmount.toString()),
+        noteController = TextEditingController(text: goal.note ?? '');
 
-  void _saveGoal(BuildContext context) {
+  void _updateGoal(BuildContext context) {
     final dateState = context.read<DateCubit>().state;
     final notesState = context.read<NotesCubit>().state;
 
@@ -44,18 +51,16 @@ class AddNewGoal extends StatelessWidget {
         return;
       }
 
-      final goalData = SavingsGoalData(
+      final updatedGoalData = SavingsGoalData(
         name: goalNameController.text,
         targetAmount: goalAmount,
         accumulatedAmount: accumulatedAmount,
         targetDate: dateState.date,
-        user: 'Anna',
+        user: goal.user, // keep the original user
         note: notesState.note.isNotEmpty ? notesState.note : null,
       );
 
-      context.read<GoalDataCubit>().addGoal(goalData);
-
-      context.read<TransactionDataCubit>().deductFromBalance(accumulatedAmount);
+      context.read<GoalDataCubit>().updateGoal(goal, updatedGoalData);
 
       goalNameController.clear();
       goalAmountController.clear();
@@ -81,7 +86,7 @@ class AddNewGoal extends StatelessWidget {
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: ScreenScaffold(
-        appBarTitle: 'Add New Goal',
+        appBarTitle: 'Edit Goal',
         leading: GestureDetector(
           onTap: () {
             Navigator.of(context).pop();
@@ -97,6 +102,15 @@ class AddNewGoal extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                SavingsGoalRow(
+                  onTap: () {},
+                  iconData: Icons.track_changes,
+                  goalName: goal.name,
+                  goalAmount: goal.targetAmount,
+                  goalAccumulated: goal.accumulatedAmount,
+                ),
+                const SizedBox(height: 16),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: TextField(
@@ -115,7 +129,7 @@ class AddNewGoal extends StatelessWidget {
                   ),
                 ),
 
-                // NumericalTextField for Goal Amount with Label
+                // Goal Amount
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Column(
@@ -135,6 +149,7 @@ class AddNewGoal extends StatelessWidget {
                   ),
                 ),
 
+                // Accumulated Amount
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Column(
@@ -225,11 +240,11 @@ class AddNewGoal extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: TextButtonModel(
             onPressed: () {
-              _saveGoal(context);
+              _updateGoal(context);
             },
             backgroundColor: kColorBlue,
             overlayColor: kColorLightBlue,
-            buttonText: 'Save Goal',
+            buttonText: 'Save Changes',
             buttonTextColor: kColorWhite,
           ),
         ),
