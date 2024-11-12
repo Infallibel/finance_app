@@ -15,15 +15,15 @@ class BottomBar extends StatefulWidget {
 
 class _BottomBarState extends State<BottomBar> {
   int indexPage = 0;
-  List screens = [
-    const HomePage(),
-    const SavingsPage(),
-    const AnalyticsPage(),
-    const SettingsPage(),
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const HomePage(),
+      const SavingsPage(),
+      const AnalyticsPage(),
+      const SettingsPage(),
+    ];
     return Scaffold(
       body: screens[indexPage],
       floatingActionButton: FloatingActionButton(

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../utilities/CubitsBlocs/addTransactionCubits/date_cubit.dart';
 import '../../utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
 import '../../utilities/constants.dart';
@@ -30,6 +31,8 @@ class EditGoal extends StatelessWidget {
     final TextEditingController noteController =
         TextEditingController(text: goalData.note);
 
+    final double originalAccumulatedAmount = goalData.accumulatedAmount;
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: ScreenScaffold(
@@ -49,7 +52,6 @@ class EditGoal extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Goal Name Input
                 TextField(
                   controller: goalNameController,
                   decoration: InputDecoration(
@@ -59,15 +61,42 @@ class EditGoal extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Goal Amount Input
-                NumericalTextField(
-                  controller: goalAmountController,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Goal Amount:',
+                      style: kFontStyleLato.copyWith(
+                        fontSize: 16,
+                        color: kColorGrey3,
+                      ),
+                    ),
+                    NumericalTextField(
+                      controller: goalAmountController,
+                    ),
+                  ],
                 ),
                 const Divider(color: kColorGrey1, thickness: 1),
-                const SizedBox(height: 16),
 
-                // Target Date Selector
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Amount Accumulated:',
+                        style: kFontStyleLato.copyWith(
+                          fontSize: 16,
+                          color: kColorGrey3,
+                        ),
+                      ),
+                      NumericalTextField(
+                        controller: accumulatedAmountController,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 BlocBuilder<DateCubit, DateState>(builder: (context, state) {
                   final selectedDate =
                       state is DateSelected ? state.date : null;
@@ -95,27 +124,6 @@ class EditGoal extends StatelessWidget {
                 }),
 
                 const SizedBox(height: 16),
-
-                // Accumulated Amount Input
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Amount Accumulated:',
-                        style: kFontStyleLato.copyWith(
-                          fontSize: 16,
-                          color: kColorGrey3,
-                        ),
-                      ),
-                      NumericalTextField(
-                        controller: accumulatedAmountController,
-                      ),
-                    ],
-                  ),
-                ),
-
                 // Note field
                 BlocBuilder<NotesCubit, NotesState>(
                   builder: (context, notesState) {
@@ -162,7 +170,9 @@ class EditGoal extends StatelessWidget {
                 return;
               }
 
-              // Construct updated goal data
+              final double accumulatedDifference =
+                  accumulatedAmount - originalAccumulatedAmount;
+
               final updatedGoalData = goalData.copyWith(
                 name: goalNameController.text,
                 targetAmount: goalAmount,
@@ -173,10 +183,12 @@ class EditGoal extends StatelessWidget {
                 note: noteController.text,
               );
 
-              // Update the goal in the cubit
               context.read<GoalDataCubit>().updateGoal(updatedGoalData);
 
-              // Clear cubits and navigate back
+              context
+                  .read<TransactionDataCubit>()
+                  .deductFromBalance(accumulatedDifference);
+
               context.read<NotesCubit>().updateNote('');
               context.read<DateCubit>().clearDate();
               Navigator.pop(context);

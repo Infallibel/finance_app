@@ -1,5 +1,7 @@
 import 'package:finance_app/screens/savings/add_new_goal.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactionCubits/date_cubit.dart';
+import 'package:finance_app/utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
+
 import 'package:finance_app/utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
 import 'package:finance_app/utilities/constants.dart';
@@ -9,8 +11,6 @@ import 'package:finance_app/widgets/savings_goal_row.dart';
 import 'package:finance_app/widgets/text_button_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
-import '../../utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/goal_load_cubit.dart';
 import 'edit_goal.dart';
 
@@ -18,62 +18,6 @@ class SavingsPage extends StatelessWidget {
   const SavingsPage({
     super.key,
   });
-
-  void _showGoalInfoDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'How Adding a New Goal Works',
-            style: kFontStyleLato.copyWith(
-                fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '1. When you add a new goal, specify the name, target amount, and any accumulated amount so far.',
-                style: kFontStyleLato.copyWith(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '2. Note that the accumulated amount will be immediately deducted from your total balance. This ensures that funds already saved for this goal are not counted as available balance.',
-                style: kFontStyleLato.copyWith(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '3. You can view all your goals here, including their progress toward your target.',
-                style: kFontStyleLato.copyWith(fontSize: 16),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: ButtonStyle(
-                overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.pressed)) {
-                      return kColorLightBlueSecondary;
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              child: Text(
-                'Got it!',
-                style: kFontStyleLato.copyWith(color: kColorBlue),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,9 +52,16 @@ class SavingsPage extends StatelessWidget {
                         ..sort((a, b) {
                           final dateA = DateFormat('dd/MM/yyyy').parse(a);
                           final dateB = DateFormat('dd/MM/yyyy').parse(b);
-                          return dateB.compareTo(dateA);
+                          return dateA.compareTo(dateB);
                         });
-
+                      if (goalDays.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No goals added yet.',
+                            style: kFontStyleLato.copyWith(color: kColorGrey2),
+                          ),
+                        );
+                      }
                       return NotificationListener<ScrollNotification>(
                         onNotification: (scrollNotification) {
                           if (scrollNotification.metrics.pixels ==
@@ -125,15 +76,6 @@ class SavingsPage extends StatelessWidget {
                               ? goalLimit
                               : goalDays.length,
                           itemBuilder: (context, index) {
-                            if (index >= goalDays.length) {
-                              return Center(
-                                child: Text(
-                                  'No goals added yet.',
-                                  style: kFontStyleLato.copyWith(
-                                      color: kColorGrey2),
-                                ),
-                              );
-                            }
                             final day = goalDays[index];
                             final goals = goalsByDay[day]!;
                             return Column(children: [
@@ -191,6 +133,62 @@ class SavingsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showGoalInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'How Adding a New Goal Works',
+            style: kFontStyleLato.copyWith(
+                fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '1. When you add a new goal, specify the name, target amount, and any accumulated amount so far.',
+                style: kFontStyleLato.copyWith(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '2. Note that the accumulated amount will be immediately deducted from your total balance. This ensures that funds already saved for this goal are not counted as available balance.',
+                style: kFontStyleLato.copyWith(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '3. You can view all your goals here, including their progress toward your target.',
+                style: kFontStyleLato.copyWith(fontSize: 16),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ButtonStyle(
+                overlayColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.pressed)) {
+                      return kColorLightBlueSecondary;
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              child: Text(
+                'Got it!',
+                style: kFontStyleLato.copyWith(color: kColorBlue),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
