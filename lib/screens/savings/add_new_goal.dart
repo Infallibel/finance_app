@@ -6,6 +6,7 @@ import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:finance_app/widgets/numerical_text_field.dart';
 import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 import '../../utilities/CubitsBlocs/addTransactionCubits/note_cubit.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/CubitsBlocs/savingsCubits/goal_data_cubit.dart';
@@ -19,6 +20,7 @@ class AddNewGoal extends StatelessWidget {
   final TextEditingController accumulatedAmountController =
       TextEditingController();
   final TextEditingController noteController = TextEditingController();
+  final String goalId = const Uuid().v4();
 
   void _saveGoal(BuildContext context) {
     final dateState = context.read<DateCubit>().state;
@@ -45,6 +47,7 @@ class AddNewGoal extends StatelessWidget {
       }
 
       final goalData = SavingsGoalData(
+        id: goalId,
         name: goalNameController.text,
         targetAmount: goalAmount,
         accumulatedAmount: accumulatedAmount,

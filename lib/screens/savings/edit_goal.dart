@@ -8,81 +8,28 @@ import '../../utilities/CubitsBlocs/savingsCubits/savings_goal_data.dart';
 import '../../utilities/constants.dart';
 import '../../widgets/icon_text_row.dart';
 import '../../widgets/numerical_text_field.dart';
-import '../../widgets/savings_goal_row.dart';
 import '../../widgets/screen_scaffold.dart';
 import '../../widgets/text_button_model.dart';
 
 class EditGoal extends StatelessWidget {
-  final SavingsGoalData goal;
-  final TextEditingController goalNameController;
-  final TextEditingController goalAmountController;
-  final TextEditingController accumulatedAmountController;
-  final TextEditingController noteController;
+  final SavingsGoalData goalData;
 
-  EditGoal({super.key, required this.goal})
-      : goalNameController = TextEditingController(text: goal.name),
-        goalAmountController =
-            TextEditingController(text: goal.targetAmount.toString()),
-        accumulatedAmountController =
-            TextEditingController(text: goal.accumulatedAmount.toString()),
-        noteController = TextEditingController(text: goal.note ?? '');
-
-  void _updateGoal(BuildContext context) {
-    final dateState = context.read<DateCubit>().state;
-    final notesState = context.read<NotesCubit>().state;
-
-    double goalAmount = double.tryParse(goalAmountController.text) ?? 0.0;
-    double accumulatedAmount =
-        double.tryParse(accumulatedAmountController.text) ?? 0.0;
-
-    if (goalNameController.text.isNotEmpty &&
-        goalAmountController.text.isNotEmpty &&
-        accumulatedAmountController.text.isNotEmpty &&
-        dateState is DateSelected) {
-      if (accumulatedAmount > goalAmount) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Accumulated amount cannot exceed the goal amount',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-        return;
-      }
-
-      final updatedGoalData = SavingsGoalData(
-        name: goalNameController.text,
-        targetAmount: goalAmount,
-        accumulatedAmount: accumulatedAmount,
-        targetDate: dateState.date,
-        user: goal.user, // keep the original user
-        note: notesState.note.isNotEmpty ? notesState.note : null,
-      );
-
-      context.read<GoalDataCubit>().updateGoal(goal, updatedGoalData);
-
-      goalNameController.clear();
-      goalAmountController.clear();
-      accumulatedAmountController.clear();
-      context.read<DateCubit>().clearDate();
-      context.read<NotesCubit>().updateNote('');
-
-      Navigator.of(context).pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Please fill all the details',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-  }
+  const EditGoal({super.key, required this.goalData});
 
   @override
   Widget build(BuildContext context) {
+    context.read<DateCubit>().selectDate(goalData.targetDate);
+    context.read<NotesCubit>().updateNote(goalData.note ?? '');
+
+    final TextEditingController goalNameController =
+        TextEditingController(text: goalData.name);
+    final TextEditingController goalAmountController =
+        TextEditingController(text: goalData.targetAmount.toString());
+    final TextEditingController accumulatedAmountController =
+        TextEditingController(text: goalData.accumulatedAmount.toString());
+    final TextEditingController noteController =
+        TextEditingController(text: goalData.note);
+
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: ScreenScaffold(
@@ -102,54 +49,54 @@ class EditGoal extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SavingsGoalRow(
-                  onTap: () {},
-                  iconData: Icons.track_changes,
-                  goalName: goal.name,
-                  goalAmount: goal.targetAmount,
-                  goalAccumulated: goal.accumulatedAmount,
+                // Goal Name Input
+                TextField(
+                  controller: goalNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Goal Name',
+                    labelStyle: kFontStyleLato.copyWith(color: kColorGrey1),
+                    border: const OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 16),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: TextField(
-                    controller: goalNameController,
-                    cursorColor: kColorGrey3,
-                    textAlign: TextAlign.center,
-                    style: kFontStyleLato.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Goal Name',
-                      hintStyle: kFontStyleLato.copyWith(color: kColorGrey3),
-                    ),
-                  ),
+                // Goal Amount Input
+                NumericalTextField(
+                  controller: goalAmountController,
                 ),
+                const Divider(color: kColorGrey1, thickness: 1),
+                const SizedBox(height: 16),
 
-                // Goal Amount
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Goal Amount:',
-                        style: kFontStyleLato.copyWith(
-                          fontSize: 16,
-                          color: kColorGrey3,
-                        ),
-                      ),
-                      NumericalTextField(
-                        controller: goalAmountController,
-                      ),
-                    ],
-                  ),
-                ),
+                // Target Date Selector
+                BlocBuilder<DateCubit, DateState>(builder: (context, state) {
+                  final selectedDate =
+                      state is DateSelected ? state.date : null;
 
-                // Accumulated Amount
+                  return IconTextAndRow(
+                    selectionText:
+                        selectedDate != null ? 'Selected' : 'Not Selected',
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate ?? DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                      );
+                      if (pickedDate != null && context.mounted) {
+                        context.read<DateCubit>().selectDate(pickedDate);
+                      }
+                    },
+                    iconData: Icons.calendar_month_outlined,
+                    iconColor: kColorGrey1,
+                    inputText: selectedDate != null
+                        ? "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"
+                        : 'Target Date',
+                  );
+                }),
+
+                const SizedBox(height: 16),
+
+                // Accumulated Amount Input
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Column(
@@ -169,66 +116,24 @@ class EditGoal extends StatelessWidget {
                   ),
                 ),
 
-                Text(
-                  'Target Date:',
-                  style: kFontStyleLato.copyWith(
-                    fontSize: 16,
-                    color: kColorGrey3,
-                  ),
-                ),
-
-                BlocBuilder<DateCubit, DateState>(
-                  builder: (context, state) {
-                    return IconTextAndRow(
-                      selectionText:
-                          state is DateSelected ? 'Selected' : 'Not Selected',
-                      onTap: () {
-                        context.read<DateCubit>().showCalendar(context);
-                      },
-                      iconData: Icons.calendar_month_outlined,
-                      iconColor: kColorGrey2,
-                      inputText: state is DateSelected
-                          ? "${state.date.day}/${state.date.month}/${state.date.year}"
-                          : 'Target Date',
-                    );
-                  },
-                ),
-
-                // Note Section
+                // Note field
                 BlocBuilder<NotesCubit, NotesState>(
                   builder: (context, notesState) {
-                    return Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.read<NotesCubit>().toggleVisibility();
-                          },
-                          child: IconTextAndRow(
-                            iconData: Icons.note_outlined,
-                            iconColor: kColorGrey2,
-                            inputText:
-                                notesState.isVisible ? 'Hide Note' : 'Add Note',
-                            selectionText: notesState.note.isNotEmpty
-                                ? 'Added'
-                                : 'Not Added',
-                          ),
-                        ),
-                        if (notesState.isVisible)
-                          TextField(
-                            controller: noteController,
-                            onChanged: (value) {
-                              context.read<NotesCubit>().updateNote(value);
-                            },
-                            decoration: const InputDecoration(
-                              focusColor: kColorBlue,
-                              hintText: 'Enter your note here',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(color: kColorBlue)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: kColorBlue)),
-                            ),
-                          ),
-                      ],
+                    noteController.text = notesState.note;
+                    return TextField(
+                      controller: noteController,
+                      decoration: InputDecoration(
+                        focusColor: kColorBlue,
+                        labelText: 'Note',
+                        labelStyle: kFontStyleLato.copyWith(color: kColorGrey1),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: kColorBlue)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: kColorBlue)),
+                      ),
+                      onChanged: (value) {
+                        context.read<NotesCubit>().updateNote(value);
+                      },
                     );
                   },
                 ),
@@ -240,7 +145,41 @@ class EditGoal extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: TextButtonModel(
             onPressed: () {
-              _updateGoal(context);
+              double goalAmount =
+                  double.tryParse(goalAmountController.text) ?? 0.0;
+              double accumulatedAmount =
+                  double.tryParse(accumulatedAmountController.text) ?? 0.0;
+
+              if (goalAmount < accumulatedAmount) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Accumulated amount cannot exceed the goal amount',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+                return;
+              }
+
+              // Construct updated goal data
+              final updatedGoalData = goalData.copyWith(
+                name: goalNameController.text,
+                targetAmount: goalAmount,
+                accumulatedAmount: accumulatedAmount,
+                targetDate: context.read<DateCubit>().state is DateSelected
+                    ? (context.read<DateCubit>().state as DateSelected).date
+                    : goalData.targetDate,
+                note: noteController.text,
+              );
+
+              // Update the goal in the cubit
+              context.read<GoalDataCubit>().updateGoal(updatedGoalData);
+
+              // Clear cubits and navigate back
+              context.read<NotesCubit>().updateNote('');
+              context.read<DateCubit>().clearDate();
+              Navigator.pop(context);
             },
             backgroundColor: kColorBlue,
             overlayColor: kColorLightBlue,
