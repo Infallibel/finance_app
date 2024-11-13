@@ -118,7 +118,6 @@ class AddNewGoal extends StatelessWidget {
                   ),
                 ),
 
-                // NumericalTextField for Goal Amount with Label
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Column(
@@ -182,7 +181,6 @@ class AddNewGoal extends StatelessWidget {
                   },
                 ),
 
-                // Note Section
                 BlocBuilder<NotesCubit, NotesState>(
                   builder: (context, notesState) {
                     return Column(

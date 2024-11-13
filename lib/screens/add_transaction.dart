@@ -61,7 +61,6 @@ class AddTransactionPage extends StatelessWidget {
 
       context.read<TransactionDataCubit>().addTransaction(transactionData);
 
-      // Reset the state
       context.read<CategoryCubit>().clearCategory();
       context.read<DateCubit>().clearDate();
       context.read<PaymentTypeCubit>().clearPaymentType();
@@ -69,7 +68,6 @@ class AddTransactionPage extends StatelessWidget {
       numberTextController.clear();
       context.read<NotesCubit>().updateNote('');
 
-      // Pop the screen
       Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

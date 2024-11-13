@@ -151,52 +151,178 @@ class EditGoal extends StatelessWidget {
         ),
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextButtonModel(
-            onPressed: () {
-              double goalAmount =
-                  double.tryParse(goalAmountController.text) ?? 0.0;
-              double accumulatedAmount =
-                  double.tryParse(accumulatedAmountController.text) ?? 0.0;
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButtonModel(
+                onPressed: () {
+                  double goalAmount =
+                      double.tryParse(goalAmountController.text) ?? 0.0;
+                  double accumulatedAmount =
+                      double.tryParse(accumulatedAmountController.text) ?? 0.0;
 
-              if (goalAmount < accumulatedAmount) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Accumulated amount cannot exceed the goal amount',
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-                return;
-              }
+                  if (goalAmount < accumulatedAmount) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Accumulated amount cannot exceed the goal amount',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                    return;
+                  }
 
-              final double accumulatedDifference =
-                  accumulatedAmount - originalAccumulatedAmount;
+                  final double accumulatedDifference =
+                      accumulatedAmount - originalAccumulatedAmount;
 
-              final updatedGoalData = goalData.copyWith(
-                name: goalNameController.text,
-                targetAmount: goalAmount,
-                accumulatedAmount: accumulatedAmount,
-                targetDate: context.read<DateCubit>().state is DateSelected
-                    ? (context.read<DateCubit>().state as DateSelected).date
-                    : goalData.targetDate,
-                note: noteController.text,
-              );
+                  final updatedGoalData = goalData.copyWith(
+                    name: goalNameController.text,
+                    targetAmount: goalAmount,
+                    accumulatedAmount: accumulatedAmount,
+                    targetDate: context.read<DateCubit>().state is DateSelected
+                        ? (context.read<DateCubit>().state as DateSelected).date
+                        : goalData.targetDate,
+                    note: noteController.text,
+                  );
 
-              context.read<GoalDataCubit>().updateGoal(updatedGoalData);
+                  context.read<GoalDataCubit>().updateGoal(updatedGoalData);
 
-              context
-                  .read<TransactionDataCubit>()
-                  .deductFromBalance(accumulatedDifference);
+                  context
+                      .read<TransactionDataCubit>()
+                      .deductFromBalance(accumulatedDifference);
 
-              context.read<NotesCubit>().updateNote('');
-              context.read<DateCubit>().clearDate();
-              Navigator.pop(context);
-            },
-            backgroundColor: kColorBlue,
-            overlayColor: kColorLightBlue,
-            buttonText: 'Save Changes',
-            buttonTextColor: kColorWhite,
+                  context.read<NotesCubit>().updateNote('');
+                  context.read<DateCubit>().clearDate();
+                  Navigator.pop(context);
+                },
+                backgroundColor: kColorBlue,
+                overlayColor: kColorLightBlue,
+                buttonText: 'Save Changes',
+                buttonTextColor: kColorWhite,
+                bottomPadding: 0,
+              ),
+              TextButtonModel(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text(
+                          'Are you sure you want to mark this goal as complete?',
+                          style: kFontStyleLato.copyWith(
+                              fontSize: 20, color: kColorGrey3),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorWarning,
+                              ),
+                              overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorLightWarning,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text('No',
+                                style: kFontStyleLato.copyWith(
+                                    color: kColorWhite)),
+                          ),
+                          TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorSuccess,
+                              ),
+                              overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorLightSuccess,
+                              ),
+                            ),
+                            onPressed: () {
+                              context.read<GoalDataCubit>().completeGoal(
+                                  goalData,
+                                  context.read<TransactionDataCubit>());
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: Text('Yes',
+                                style: kFontStyleLato.copyWith(
+                                    color: kColorWhite)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                backgroundColor: kColorSuccess,
+                overlayColor: kColorLightSuccess,
+                buttonText: 'Complete Goal',
+                buttonTextColor: kColorWhite,
+                bottomPadding: 0,
+              ),
+              TextButtonModel(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Text(
+                          'Are you sure you want to delete this goal?',
+                          style: kFontStyleLato.copyWith(
+                              fontSize: 20, color: kColorGrey3),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorBlue,
+                              ),
+                              overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorLightBlue,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: Text(
+                              'No',
+                              style:
+                                  kFontStyleLato.copyWith(color: kColorWhite),
+                            ),
+                          ),
+                          TextButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorWarning,
+                              ),
+                              overlayColor: WidgetStateProperty.resolveWith(
+                                (states) => kColorLightWarning,
+                              ),
+                            ),
+                            onPressed: () {
+                              context.read<GoalDataCubit>().deleteGoal(goalData,
+                                  context.read<TransactionDataCubit>());
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: Text('Yes',
+                                style: kFontStyleLato.copyWith(
+                                    color: kColorWhite)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                backgroundColor: kColorWarning,
+                overlayColor: kColorLightWarning,
+                buttonText: 'Delete Goal',
+                buttonTextColor: kColorWhite,
+                bottomPadding: 8,
+              ),
+            ],
           ),
         ),
       ),

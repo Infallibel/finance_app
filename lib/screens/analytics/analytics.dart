@@ -60,7 +60,6 @@ class AnalyticsPage extends StatelessWidget {
                     },
                   ).toList();
 
-                  // Group transactions by day for display
                   final transactionsByDay =
                       transactions.fold<Map<String, List<TransactionData>>>(
                     {},
@@ -75,7 +74,6 @@ class AnalyticsPage extends StatelessWidget {
                     },
                   );
 
-                  // Sort the transaction days
                   final sortedTransactionDays = transactionsByDay.keys.toList()
                     ..sort((a, b) {
                       final dateA = DateFormat('dd/MM/yyyy').parse(a);

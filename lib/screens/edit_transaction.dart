@@ -271,9 +271,9 @@ class EditTransactionPage extends StatelessWidget {
                                   .clearTransactionType();
                               context.read<NotesCubit>().updateNote('');
 
-                              Navigator.pop(context); // Close the dialog
+                              Navigator.pop(context);
                               Navigator.pop(
-                                  context); // Go back to the previous screen
+                                  context);
                             },
                             child: Text(
                               'Yes',
