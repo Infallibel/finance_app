@@ -282,7 +282,10 @@ class EditTransactionPage extends StatelessWidget {
                               onPressed: () {
                                 context
                                     .read<TransactionDataCubit>()
-                                    .deleteTransaction(transactionData.id);
+                                    .deleteTransaction(
+                                        transactionId: transactionData.id,
+                                        transactionAmount:
+                                            transactionData.amount);
 
                                 context.read<CategoryCubit>().clearCategory();
                                 context.read<DateCubit>().clearDate();
