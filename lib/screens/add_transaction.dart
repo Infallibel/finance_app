@@ -26,6 +26,14 @@ class AddTransactionPage extends StatelessWidget {
   final TextEditingController noteController = TextEditingController();
   final FocusNode numberTextFocusNode = FocusNode();
 
+  void _clearCubits(BuildContext context) {
+    context.read<CategoryCubit>().clearCategory();
+    context.read<DateCubit>().clearDate();
+    context.read<PaymentTypeCubit>().clearPaymentType();
+    context.read<TransactionTypeCubit>().clearTransactionType();
+    context.read<NotesCubit>().updateNote('');
+  }
+
   void _saveTransaction(BuildContext context) {
     final categoryState = context.read<CategoryCubit>().state;
     final dateState = context.read<DateCubit>().state;
@@ -61,12 +69,7 @@ class AddTransactionPage extends StatelessWidget {
 
       context.read<TransactionDataCubit>().addTransaction(transactionData);
 
-      context.read<CategoryCubit>().clearCategory();
-      context.read<DateCubit>().clearDate();
-      context.read<PaymentTypeCubit>().clearPaymentType();
-      context.read<TransactionTypeCubit>().clearTransactionType();
-      numberTextController.clear();
-      context.read<NotesCubit>().updateNote('');
+      _clearCubits(context);
 
       Navigator.of(context).pop();
     } else {
@@ -84,166 +87,177 @@ class AddTransactionPage extends StatelessWidget {
     if (numberTextController.text.isEmpty) {
       numberTextFocusNode.unfocus();
     }
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: ScreenScaffold(
-        appBarTitle: 'Add Transaction',
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.clear_outlined,
-            color: kColorGrey2,
-          ),
-        ),
-        scaffoldBody: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const TransactionSelection(),
-                NumericalTextField(
-                  controller: numberTextController,
-                ),
-                const Divider(
-                  color: kColorGrey1,
-                  thickness: 1,
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    IconTextAndRow(
-                        selectionText: 'Selected',
-                        iconData: Icons.person_outlined,
-                        iconColor: kColorGrey1,
-                        inputText: user),
-                    BlocBuilder<DateCubit, DateState>(
-                      builder: (context, state) {
-                        if (state is DateSelected) {
-                          return IconTextAndRow(
-                            selectionText: 'Selected',
-                            onTap: () {
-                              context.read<DateCubit>().showCalendar(context);
-                            },
-                            iconData: Icons.calendar_month_outlined,
-                            iconColor: kColorGrey1,
-                            inputText:
-                                "${state.date.day}/${state.date.month}/${state.date.year}",
-                          );
-                        } else {
-                          return IconTextAndRow(
-                            selectionText: 'Not Selected',
-                            onTap: () {
-                              context.read<DateCubit>().showCalendar(context);
-                            },
-                            iconData: Icons.calendar_month_outlined,
-                            iconColor: kColorGrey1,
-                            inputText: 'Date',
-                          );
-                        }
-                      },
-                    ),
-                    BlocBuilder<CategoryCubit, CategoryState>(
-                      builder: (context, state) {
-                        return IconTextAndRow(
-                            selectionText: state is CategorySelected
-                                ? 'Selected'
-                                : 'Not Selected',
-                            onTap: () {
-                              context
-                                  .read<CategoryCubit>()
-                                  .showOptions(context);
-                            },
-                            iconData: state is CategorySelected
-                                ? state.category['iconData']
-                                : Icons.folder_copy_outlined,
-                            iconColor: kColorGrey1,
-                            inputText: state is CategorySelected
-                                ? state.category['inputText']
-                                : 'Category');
-                      },
-                    ),
-                    BlocBuilder<PaymentTypeCubit, PaymentTypeState>(
-                      builder: (context, state) {
-                        return IconTextAndRow(
-                            selectionText: state is PaymentTypeSelected
-                                ? 'Selected'
-                                : 'Not Selected',
-                            onTap: () {
-                              context
-                                  .read<PaymentTypeCubit>()
-                                  .showOptions(context);
-                            },
-                            iconData: state is PaymentTypeSelected
-                                ? state.paymentType['iconData']
-                                : Icons.credit_card_outlined,
-                            iconColor: kColorGrey1,
-                            inputText: state is PaymentTypeSelected
-                                ? state.paymentType['inputText']
-                                : 'Card');
-                      },
-                    ),
-                    const IconTextAndRow(
-                        iconData: Icons.photo_camera_outlined,
-                        iconColor: kColorGrey1,
-                        inputText: 'Photo'),
-
-                    ///TODO make it so taking photos is possible
-                    BlocBuilder<NotesCubit, NotesState>(
-                        builder: (context, notesState) {
-                      return Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              context.read<NotesCubit>().toggleVisibility();
-                            },
-                            child: IconTextAndRow(
-                              iconData: Icons.note_outlined,
-                              iconColor: kColorGrey1,
-                              inputText: notesState.isVisible
-                                  ? 'Hide Note'
-                                  : 'Add Note',
-                              selectionText: notesState.note.isNotEmpty
-                                  ? 'Added'
-                                  : 'Not Added',
-                            ),
-                          ),
-                          if (notesState.isVisible)
-                            TextField(
-                              controller: noteController,
-                              onChanged: (value) {
-                                context.read<NotesCubit>().updateNote(value);
-                              },
-                              decoration: const InputDecoration(
-                                focusColor: kColorBlue,
-                                hintText: 'Enter your note here',
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide(color: kColorBlue)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: kColorBlue)),
-                              ),
-                            ),
-                        ],
-                      );
-                    }),
-                  ],
-                ),
-              ],
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          _clearCubits(context);
+          Navigator.pop(context);
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: ScreenScaffold(
+          appBarTitle: 'Add Transaction',
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: const Icon(
+              Icons.clear_outlined,
+              color: kColorGrey2,
             ),
           ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextButtonModel(
-            onPressed: () {
-              _saveTransaction(context);
-            },
-            backgroundColor: kColorBlue,
-            overlayColor: kColorLightBlue,
-            buttonText: 'Save',
-            buttonTextColor: kColorWhite,
+          scaffoldBody: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const TransactionSelection(),
+                  NumericalTextField(
+                    controller: numberTextController,
+                  ),
+                  const Divider(
+                    color: kColorGrey1,
+                    thickness: 1,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      IconTextAndRow(
+                          selectionText: 'Selected',
+                          iconData: Icons.person_outlined,
+                          iconColor: kColorGrey1,
+                          inputText: user),
+                      BlocBuilder<DateCubit, DateState>(
+                        builder: (context, state) {
+                          if (state is DateSelected) {
+                            return IconTextAndRow(
+                              selectionText: 'Selected',
+                              onTap: () {
+                                context.read<DateCubit>().showCalendar(context);
+                              },
+                              iconData: Icons.calendar_month_outlined,
+                              iconColor: kColorGrey1,
+                              inputText:
+                                  "${state.date.day}/${state.date.month}/${state.date.year}",
+                            );
+                          } else {
+                            return IconTextAndRow(
+                              selectionText: 'Not Selected',
+                              onTap: () {
+                                context.read<DateCubit>().showCalendar(context);
+                              },
+                              iconData: Icons.calendar_month_outlined,
+                              iconColor: kColorGrey1,
+                              inputText: 'Date',
+                            );
+                          }
+                        },
+                      ),
+                      BlocBuilder<CategoryCubit, CategoryState>(
+                        builder: (context, state) {
+                          return IconTextAndRow(
+                              selectionText: state is CategorySelected
+                                  ? 'Selected'
+                                  : 'Not Selected',
+                              onTap: () {
+                                context
+                                    .read<CategoryCubit>()
+                                    .showOptions(context);
+                              },
+                              iconData: state is CategorySelected
+                                  ? state.category['iconData']
+                                  : Icons.folder_copy_outlined,
+                              iconColor: kColorGrey1,
+                              inputText: state is CategorySelected
+                                  ? state.category['inputText']
+                                  : 'Category');
+                        },
+                      ),
+                      BlocBuilder<PaymentTypeCubit, PaymentTypeState>(
+                        builder: (context, state) {
+                          return IconTextAndRow(
+                              selectionText: state is PaymentTypeSelected
+                                  ? 'Selected'
+                                  : 'Not Selected',
+                              onTap: () {
+                                context
+                                    .read<PaymentTypeCubit>()
+                                    .showOptions(context);
+                              },
+                              iconData: state is PaymentTypeSelected
+                                  ? state.paymentType['iconData']
+                                  : Icons.credit_card_outlined,
+                              iconColor: kColorGrey1,
+                              inputText: state is PaymentTypeSelected
+                                  ? state.paymentType['inputText']
+                                  : 'Card');
+                        },
+                      ),
+                      const IconTextAndRow(
+                          iconData: Icons.photo_camera_outlined,
+                          iconColor: kColorGrey1,
+                          inputText: 'Photo'),
+
+                      ///TODO make it so taking photos is possible
+                      BlocBuilder<NotesCubit, NotesState>(
+                          builder: (context, notesState) {
+                        return Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                context.read<NotesCubit>().toggleVisibility();
+                              },
+                              child: IconTextAndRow(
+                                iconData: Icons.note_outlined,
+                                iconColor: kColorGrey1,
+                                inputText: notesState.isVisible
+                                    ? 'Hide Note'
+                                    : 'Add Note',
+                                selectionText: notesState.note.isNotEmpty
+                                    ? 'Added'
+                                    : 'Not Added',
+                              ),
+                            ),
+                            if (notesState.isVisible)
+                              TextField(
+                                controller: noteController,
+                                onChanged: (value) {
+                                  context.read<NotesCubit>().updateNote(value);
+                                },
+                                decoration: const InputDecoration(
+                                  focusColor: kColorBlue,
+                                  hintText: 'Enter your note here',
+                                  border: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: kColorBlue)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide:
+                                          BorderSide(color: kColorBlue)),
+                                ),
+                              ),
+                          ],
+                        );
+                      }),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextButtonModel(
+              onPressed: () {
+                _saveTransaction(context);
+              },
+              backgroundColor: kColorBlue,
+              overlayColor: kColorLightBlue,
+              buttonText: 'Save',
+              buttonTextColor: kColorWhite,
+            ),
           ),
         ),
       ),

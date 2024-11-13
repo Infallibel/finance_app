@@ -60,6 +60,8 @@ class TransactionDataCubit extends Cubit<List<TransactionData>> {
     state.removeWhere((transaction) => transaction.id == transactionId);
     emit(List.from(state));
     _calculateInitialBalance();
+
+    /// TODO this just removes balance and it is 0 when there are goals added, because initial balance is not taking goal cubits into consideration
   }
 
   Map<String, List<TransactionData>> get transactionsByDay {

@@ -22,6 +22,14 @@ class AddNewGoal extends StatelessWidget {
   final TextEditingController noteController = TextEditingController();
   final String goalId = const Uuid().v4();
 
+  _clearCubits(BuildContext context) {
+    goalNameController.clear();
+    goalAmountController.clear();
+    accumulatedAmountController.clear();
+    context.read<DateCubit>().clearDate();
+    context.read<NotesCubit>().updateNote('');
+  }
+
   void _saveGoal(BuildContext context) {
     final dateState = context.read<DateCubit>().state;
     final notesState = context.read<NotesCubit>().state;
@@ -60,11 +68,7 @@ class AddNewGoal extends StatelessWidget {
 
       context.read<TransactionDataCubit>().deductFromBalance(accumulatedAmount);
 
-      goalNameController.clear();
-      goalAmountController.clear();
-      accumulatedAmountController.clear();
-      context.read<DateCubit>().clearDate();
-      context.read<NotesCubit>().updateNote('');
+      _clearCubits(context);
 
       Navigator.of(context).pop();
     } else {
@@ -81,157 +85,162 @@ class AddNewGoal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      child: ScreenScaffold(
-        appBarTitle: 'Add New Goal',
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: const Icon(
-            Icons.clear_outlined,
-            color: kColorGrey2,
-          ),
-        ),
-        scaffoldBody: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: TextField(
-                    controller: goalNameController,
-                    cursorColor: kColorGrey3,
-                    textAlign: TextAlign.center,
-                    style: kFontStyleLato.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'Goal Name',
-                      hintStyle: kFontStyleLato.copyWith(color: kColorGrey3),
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Goal Amount:',
-                        style: kFontStyleLato.copyWith(
-                          fontSize: 16,
-                          color: kColorGrey3,
-                        ),
-                      ),
-                      NumericalTextField(
-                        controller: goalAmountController,
-                      ),
-                    ],
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Amount Accumulated:',
-                        style: kFontStyleLato.copyWith(
-                          fontSize: 16,
-                          color: kColorGrey3,
-                        ),
-                      ),
-                      NumericalTextField(
-                        controller: accumulatedAmountController,
-                      ),
-                    ],
-                  ),
-                ),
-
-                Text(
-                  'Target Date:',
-                  style: kFontStyleLato.copyWith(
-                    fontSize: 16,
-                    color: kColorGrey3,
-                  ),
-                ),
-
-                BlocBuilder<DateCubit, DateState>(
-                  builder: (context, state) {
-                    return IconTextAndRow(
-                      selectionText:
-                          state is DateSelected ? 'Selected' : 'Not Selected',
-                      onTap: () {
-                        context.read<DateCubit>().showCalendar(context);
-                      },
-                      iconData: Icons.calendar_month_outlined,
-                      iconColor: kColorGrey2,
-                      inputText: state is DateSelected
-                          ? "${state.date.day}/${state.date.month}/${state.date.year}"
-                          : 'Target Date',
-                    );
-                  },
-                ),
-
-                BlocBuilder<NotesCubit, NotesState>(
-                  builder: (context, notesState) {
-                    return Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            context.read<NotesCubit>().toggleVisibility();
-                          },
-                          child: IconTextAndRow(
-                            iconData: Icons.note_outlined,
-                            iconColor: kColorGrey2,
-                            inputText:
-                                notesState.isVisible ? 'Hide Note' : 'Add Note',
-                            selectionText: notesState.note.isNotEmpty
-                                ? 'Added'
-                                : 'Not Added',
-                          ),
-                        ),
-                        if (notesState.isVisible)
-                          TextField(
-                            controller: noteController,
-                            onChanged: (value) {
-                              context.read<NotesCubit>().updateNote(value);
-                            },
-                            decoration: const InputDecoration(
-                              focusColor: kColorBlue,
-                              hintText: 'Enter your note here',
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide(color: kColorBlue)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: kColorBlue)),
-                            ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ],
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          _clearCubits(context);
+          Navigator.pop(context);
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: ScreenScaffold(
+          appBarTitle: 'Add New Goal',
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: const Icon(
+              Icons.clear_outlined,
+              color: kColorGrey2,
             ),
           ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: TextButtonModel(
-            onPressed: () {
-              _saveGoal(context);
-            },
-            backgroundColor: kColorBlue,
-            overlayColor: kColorLightBlue,
-            buttonText: 'Save Goal',
-            buttonTextColor: kColorWhite,
+          scaffoldBody: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: TextField(
+                      controller: goalNameController,
+                      cursorColor: kColorGrey3,
+                      textAlign: TextAlign.center,
+                      style: kFontStyleLato.copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Goal Name',
+                        hintStyle: kFontStyleLato.copyWith(color: kColorGrey3),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Goal Amount:',
+                          style: kFontStyleLato.copyWith(
+                            fontSize: 16,
+                            color: kColorGrey3,
+                          ),
+                        ),
+                        NumericalTextField(
+                          controller: goalAmountController,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Amount Accumulated:',
+                          style: kFontStyleLato.copyWith(
+                            fontSize: 16,
+                            color: kColorGrey3,
+                          ),
+                        ),
+                        NumericalTextField(
+                          controller: accumulatedAmountController,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'Target Date:',
+                    style: kFontStyleLato.copyWith(
+                      fontSize: 16,
+                      color: kColorGrey3,
+                    ),
+                  ),
+                  BlocBuilder<DateCubit, DateState>(
+                    builder: (context, state) {
+                      return IconTextAndRow(
+                        selectionText:
+                            state is DateSelected ? 'Selected' : 'Not Selected',
+                        onTap: () {
+                          context.read<DateCubit>().showCalendar(context);
+                        },
+                        iconData: Icons.calendar_month_outlined,
+                        iconColor: kColorGrey2,
+                        inputText: state is DateSelected
+                            ? "${state.date.day}/${state.date.month}/${state.date.year}"
+                            : 'Target Date',
+                      );
+                    },
+                  ),
+                  BlocBuilder<NotesCubit, NotesState>(
+                    builder: (context, notesState) {
+                      return Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              context.read<NotesCubit>().toggleVisibility();
+                            },
+                            child: IconTextAndRow(
+                              iconData: Icons.note_outlined,
+                              iconColor: kColorGrey2,
+                              inputText: notesState.isVisible
+                                  ? 'Hide Note'
+                                  : 'Add Note',
+                              selectionText: notesState.note.isNotEmpty
+                                  ? 'Added'
+                                  : 'Not Added',
+                            ),
+                          ),
+                          if (notesState.isVisible)
+                            TextField(
+                              controller: noteController,
+                              onChanged: (value) {
+                                context.read<NotesCubit>().updateNote(value);
+                              },
+                              decoration: const InputDecoration(
+                                focusColor: kColorBlue,
+                                hintText: 'Enter your note here',
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide(color: kColorBlue)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: kColorBlue)),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextButtonModel(
+              onPressed: () {
+                _saveGoal(context);
+              },
+              backgroundColor: kColorBlue,
+              overlayColor: kColorLightBlue,
+              buttonText: 'Save Goal',
+              buttonTextColor: kColorWhite,
+            ),
           ),
         ),
       ),
