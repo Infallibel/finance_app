@@ -28,5 +28,14 @@ const kColorPink = Color(0xffff99d7);
 const kColorGreen = Color(0xff98d8aa);
 const kColorDarkBlue = Color(0xff9ba9c4);
 const kColorLightBlueSecondary = Color(0xffe7efff);
+const kColorRust = Color(0xffc97a5a);
+const kColorCoral = Color(0xffff7f50);
+const kColorOliveGreen = Color(0xffa3b18a);
+const kColorTeal = Color(0xff48a999);
+const kColorOlive = Color(0xffa6a06e);
+const kColorSoftRed = Color(0xfff7a1a1);
+const kColorDeepSkyBlue = Color(0xff81c4eb);
+const kColorLavender = Color(0xffc9a8e8);
+const kColorAmber = Color(0xffffd966);
 
 const kFontStyleLato = TextStyle(fontFamily: 'Lato');

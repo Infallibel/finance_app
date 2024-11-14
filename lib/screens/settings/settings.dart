@@ -3,8 +3,8 @@ import 'package:finance_app/widgets/icon_text_row.dart';
 import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
+import 'category_editor.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -39,10 +39,18 @@ class SettingsPage extends StatelessWidget {
                 iconData: Icons.notifications_outlined,
                 iconColor: kColorBlue,
                 inputText: 'Notifications'),
-            const IconTextAndRow(
-                iconData: Icons.folder_copy_outlined,
-                iconColor: kColorBlue,
-                inputText: 'Categories'),
+            IconTextAndRow(
+              iconData: Icons.folder_copy_outlined,
+              iconColor: kColorBlue,
+              inputText: 'Categories',
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => CategoryEditor(),
+                  ),
+                );
+              },
+            ),
             IconTextAndRow(
               iconData: Icons.contrast_outlined,
               iconColor: kColorBlue,
