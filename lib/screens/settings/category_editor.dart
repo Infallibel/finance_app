@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
+import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/constants.dart';
 import '../../utilities/icons.dart';
 import '../../widgets/screen_scaffold.dart';
@@ -11,7 +12,8 @@ class CategoryEditor extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryCubit = context.read<CategoryCubit>();
+    final categoryCubit = context.watch<CategoryCubit>();
+    final transactionDataCubit = context.watch<TransactionDataCubit>();
 
     return ScreenScaffold(
       appBarTitle: 'Edit Categories',
@@ -67,7 +69,14 @@ class CategoryEditor extends StatelessWidget {
                         Icons.delete,
                         color: kColorGrey2,
                       ),
-                      onPressed: () => categoryCubit.removeCategory(index),
+                      onPressed: () {
+                        _confirmAndDeleteCategory(
+                          context,
+                          categoryCubit,
+                          transactionDataCubit,
+                          index,
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -89,6 +98,72 @@ class CategoryEditor extends StatelessWidget {
         onPressed: () => _addCategory(context),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  void _confirmAndDeleteCategory(
+      BuildContext context,
+      CategoryCubit categoryCubit,
+      TransactionDataCubit transactionDataCubit,
+      int index) {
+    final category = categoryCubit.categories[index];
+    final categoryId = category['id'];
+
+    final isCategoryAssigned = transactionDataCubit.state.any((transaction) {
+      return transaction.category['id'] == categoryId;
+    });
+
+    if (isCategoryAssigned) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This category cannot be deleted as it is assigned to one or more transactions.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(
+            'Are you sure you want to delete this category?',
+            style: kFontStyleLato.copyWith(fontSize: 20, color: kColorGrey3),
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(kColorBlue),
+                overlayColor: WidgetStateProperty.all(kColorLightBlue),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'No',
+                style: kFontStyleLato.copyWith(color: kColorWhite),
+              ),
+            ),
+            TextButton(
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(kColorWarning),
+                overlayColor: WidgetStateProperty.all(kColorLightWarning),
+              ),
+              onPressed: () {
+                categoryCubit.removeCategory(index);
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Yes',
+                style: kFontStyleLato.copyWith(color: kColorWhite),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -146,9 +221,8 @@ class CategoryEditor extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Pick a color'),
           content: SingleChildScrollView(
-            child: BlockPicker(
+            child: ColorPicker(
               pickerColor: pickerColor,
               onColorChanged: (Color color) {
                 pickerColor = color;
@@ -157,13 +231,19 @@ class CategoryEditor extends StatelessWidget {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: kFontStyleLato.copyWith(color: kColorBlue),
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('Select'),
+              child: Text(
+                'Select',
+                style: kFontStyleLato.copyWith(color: kColorBlue),
+              ),
               onPressed: () {
                 onColorSelected(pickerColor);
                 Navigator.of(context).pop();
@@ -186,109 +266,131 @@ class CategoryEditor extends StatelessWidget {
     return await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Center(
-              child: Text(category != null ? 'Edit Category' : 'Add Category')),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                textAlign: TextAlign.center,
-                controller: textController,
-                decoration: const InputDecoration(
-                  focusColor: kColorBlue,
-                  hintText: 'Category Name',
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: kColorBlue)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: kColorBlue)),
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Center(
+                  child: Text(
+                      category != null ? 'Edit Category' : 'Add Category')),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    textAlign: TextAlign.center,
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      focusColor: kColorBlue,
+                      hintText: 'Category Name',
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(color: kColorBlue)),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: kColorBlue)),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      _showIconPicker(context, (selected) {
+                        setState(() {
+                          selectedIcon = selected;
+                        });
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          selectedIcon,
+                          color: kColorGrey3,
+                          size: 30,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          category != null ? 'Change Icon' : 'Pick Icon',
+                          style: kFontStyleLato
+                              .copyWith(color: kColorGrey3)
+                              .copyWith(fontSize: 18),
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      _showColorPicker(context, selectedColor, (color) {
+                        setState(() {
+                          selectedColor = color;
+                        });
+                      });
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          selectedIcon,
+                          color: selectedColor,
+                          size: 30,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Text(
+                          category != null ? 'Change Color' : 'Pick Color',
+                          style: kFontStyleLato
+                              .copyWith(color: selectedColor)
+                              .copyWith(fontSize: 18),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  child: Text(
+                    'Cancel',
+                    style: kFontStyleLato.copyWith(color: kColorBlue),
+                  ),
+                  onPressed: () => Navigator.pop(context),
                 ),
-              ),
-              SizedBox(
-                height: 24,
-              ),
-              GestureDetector(
-                onTap: () async {
-                  _showIconPicker(context, (selected) {
-                    selectedIcon = selected;
-                  });
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      selectedIcon,
-                      color: kColorGrey3,
-                      size: 30,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      category != null ? 'Change Icon' : 'Pick Icon',
-                      style: kFontStyleLato
-                          .copyWith(color: kColorGrey3)
-                          .copyWith(fontSize: 18),
-                    )
-                  ],
+                TextButton(
+                  child: Text(
+                    'Save',
+                    style: kFontStyleLato.copyWith(color: kColorBlue),
+                  ),
+                  onPressed: () {
+                    final newCategory = {
+                      'iconData': selectedIcon,
+                      'iconColor': selectedColor,
+                      'inputText': textController.text,
+                    };
+                    if (newCategory.containsValue('')) {
+                      {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please fill all the details',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                    } else {
+                      Navigator.pop(context, newCategory);
+                    }
+                  },
                 ),
-              ),
-              SizedBox(
-                height: 24,
-              ),
-              GestureDetector(
-                onTap: () async {
-                  _showColorPicker(context, selectedColor, (color) {
-                    selectedColor = color;
-                  });
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      selectedIcon,
-                      color: selectedColor,
-                      size: 30,
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Text(
-                      category != null ? 'Change Color' : 'Pick Color',
-                      style: kFontStyleLato
-                          .copyWith(color: selectedColor)
-                          .copyWith(fontSize: 18),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: kFontStyleLato.copyWith(color: kColorBlue),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            TextButton(
-              child: Text(
-                'Save',
-                style: kFontStyleLato.copyWith(color: kColorBlue),
-              ),
-              onPressed: () {
-                final newCategory = {
-                  'iconData': selectedIcon,
-                  'iconColor': selectedColor,
-                  'inputText': textController.text,
-                };
-                Navigator.pop(context, newCategory);
-              },
-            ),
-          ],
+              ],
+            );
+          },
         );
       },
     );

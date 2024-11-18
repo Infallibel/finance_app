@@ -1,49 +1,72 @@
 import 'package:finance_app/screens/edit_transaction.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/transaction_data.dart';
+import '../utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import 'icon_text_row.dart';
 import 'package:finance_app/utilities/constants.dart';
 
 class TransactionDayColumn extends StatelessWidget {
-  const TransactionDayColumn(
-      {super.key, required this.day, required this.transactions});
+  const TransactionDayColumn({
+    super.key,
+    required this.day,
+    required this.transactions,
+  });
 
   final String day;
   final List<TransactionData> transactions;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: Text(
-            day,
-            style: kFontStyleLato.copyWith(color: kColorGrey2),
-          ),
-        ),
-        ...transactions.map((transaction) {
-          return IconTextAndRow(
-            iconData: transaction.category['iconData'],
-            iconColor: transaction.category['iconColor'],
-            inputText: transaction.category['inputText'],
-            transactionType: transaction.transactionType,
-            amount: transaction.transactionType == 'Expenses'
-                ? -transaction.amount
-                : transaction.amount,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      EditTransactionPage(transactionData: transaction),
-                ),
+    return BlocBuilder<CategoryCubit, CategoryState>(
+      builder: (context, state) {
+        final updatedTransactions = transactions.map((transaction) {
+          if (state is CategoryUpdated) {
+            if (transaction.category['id'] == state.category['id']) {
+              return transaction.copyWith(category: state.category);
+            }
+          } else if (state is CategoryDeleted) {
+            if (transaction.category['id'] ==
+                context.read<CategoryCubit>().categories[state.index]['id']) {
+              return transaction.copyWith(category: null); // Reset category
+            }
+          }
+          return transaction;
+        });
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6.0),
+              child: Text(
+                day,
+                style: kFontStyleLato.copyWith(color: kColorGrey2),
+              ),
+            ),
+            ...updatedTransactions.map((transaction) {
+              return IconTextAndRow(
+                iconData: transaction.category['iconData'],
+                iconColor: transaction.category['iconColor'],
+                inputText: transaction.category['inputText'],
+                transactionType: transaction.transactionType,
+                amount: transaction.transactionType == 'Expenses'
+                    ? -transaction.amount
+                    : transaction.amount,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditTransactionPage(transactionData: transaction),
+                    ),
+                  );
+                },
               );
-            },
-          );
-        }),
-      ],
+            }),
+          ],
+        );
+      },
     );
   }
 }
