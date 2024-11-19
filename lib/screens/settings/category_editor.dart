@@ -62,7 +62,14 @@ class CategoryEditor extends StatelessWidget {
                         Icons.edit,
                         color: kColorGrey2,
                       ),
-                      onPressed: () => _editCategory(context, index, category),
+                      onPressed: () {
+                        final categoryId = context
+                            .read<CategoryCubit>()
+                            .categories[index]['id'];
+                        print(
+                            'Edit button pressed for category ID: $categoryId'); // Debugging
+                        _editCategory(context, categoryId, category);
+                      },
                     ),
                     IconButton(
                       icon: Icon(
@@ -153,7 +160,9 @@ class CategoryEditor extends StatelessWidget {
                 overlayColor: WidgetStateProperty.all(kColorLightWarning),
               ),
               onPressed: () {
-                categoryCubit.removeCategory(index);
+                final categoryId =
+                    context.read<CategoryCubit>().categories[index]['id'];
+                categoryCubit.removeCategory(categoryId);
                 Navigator.of(context).pop();
               },
               child: Text(
@@ -174,11 +183,13 @@ class CategoryEditor extends StatelessWidget {
     }
   }
 
-  void _editCategory(BuildContext context, int index,
+  void _editCategory(BuildContext context, String categoryId,
       Map<String, dynamic> currentCategory) async {
+    print('Editing category with ID: $categoryId'); // Debugging
     final updatedCategory = await _showCategoryDialog(context, currentCategory);
     if (updatedCategory != null && context.mounted) {
-      context.read<CategoryCubit>().updateCategory(index, updatedCategory);
+      print('Updated category: $updatedCategory'); // Debugging
+      context.read<CategoryCubit>().updateCategory(categoryId, updatedCategory);
     }
   }
 

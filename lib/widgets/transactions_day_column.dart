@@ -20,19 +20,28 @@ class TransactionDayColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryCubit, CategoryState>(
       builder: (context, state) {
+        print('Current State: $state');
+
         final updatedTransactions = transactions.map((transaction) {
+          print('Transaction before update: ${transaction.category}');
+
           if (state is CategoryUpdated) {
             if (transaction.category['id'] == state.category['id']) {
+              print(
+                  'Updating category for transaction: ${transaction.category['id']}');
               return transaction.copyWith(category: state.category);
             }
           } else if (state is CategoryDeleted) {
-            if (transaction.category['id'] ==
-                context.read<CategoryCubit>().categories[state.index]['id']) {
+            if (transaction.category['id'] == state.categoryId) {
+              print('Resetting category for transaction: $transaction');
+              // Match by ID
               return transaction.copyWith(category: null); // Reset category
             }
           }
+          print('Transaction after update: ${transaction.category}');
           return transaction;
-        });
+        }).toList();
+        print('Updated transactions: $updatedTransactions');
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

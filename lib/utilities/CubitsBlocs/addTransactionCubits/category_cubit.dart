@@ -20,13 +20,14 @@ class CategoryAdded extends CategoryState {
 
 class CategoryUpdated extends CategoryState {
   final Map<String, dynamic> category;
-  final int index;
-  CategoryUpdated(this.category, this.index);
+  CategoryUpdated(
+    this.category,
+  );
 }
 
 class CategoryDeleted extends CategoryState {
-  final int index;
-  CategoryDeleted(this.index);
+  final String categoryId;
+  CategoryDeleted(this.categoryId);
 }
 
 class CategoryError extends CategoryState {
@@ -178,15 +179,26 @@ class CategoryCubit extends Cubit<CategoryState> {
     emit(CategoryAdded(newCategory));
   }
 
-  void updateCategory(int index, Map<String, dynamic> updatedCategory) {
-    updatedCategory['id'] = categories[index]['id'];
-    categories[index] = updatedCategory;
-    emit(CategoryUpdated(updatedCategory, index));
+  void updateCategory(String categoryId, Map<String, dynamic> updatedCategory) {
+    final index =
+        categories.indexWhere((category) => category['id'] == categoryId);
+    if (index != -1) {
+      updatedCategory['id'] = categories[index]['id'];
+      categories[index] = updatedCategory;
+      print('Emitting CategoryUpdated with category: $updatedCategory');
+      emit(CategoryUpdated(updatedCategory));
+    }
   }
 
-  void removeCategory(int index) {
-    categories.removeAt(index);
-    emit(CategoryDeleted(index));
+  void removeCategory(String categoryId) {
+    final index =
+        categories.indexWhere((category) => category['id'] == categoryId);
+    final deletedCategory = categories[index];
+    categories = categories
+        .where((category) => category['id'] != deletedCategory['id'])
+        .toList();
+    emit(CategoryDeleted(deletedCategory['id']));
+    print('Deleted category with ID: ${deletedCategory['id']}');
   }
 
   void selectCategory(Map<String, dynamic> category) {
