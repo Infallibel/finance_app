@@ -6,7 +6,7 @@ import 'package:finance_app/widgets/total_balance_home.dart';
 import 'package:finance_app/widgets/transactions_day_column.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import '../../services/transaction_data.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'all_transactions.dart';
@@ -22,27 +22,37 @@ class HomePage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: kColorBlue, width: 2)),
-                  child: const Icon(
-                    Icons.person_outlined,
-                    color: kColorBlue,
-                    size: 26,
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<ProfileScreen>(
+                    builder: (context) => const ProfileScreen(),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16.0),
-                  child: Text(
-                    'Anna',
-                    style: kFontStyleLato.copyWith(
-                        color: kColorBlue, fontSize: 16),
+                );
+              },
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: kColorBlue, width: 2)),
+                    child: const Icon(
+                      Icons.person_outlined,
+                      color: kColorBlue,
+                      size: 26,
+                    ),
                   ),
-                )
-              ],
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: Text(
+                      'Anna',
+                      style: kFontStyleLato.copyWith(
+                          color: kColorBlue, fontSize: 16),
+                    ),
+                  )
+                ],
+              ),
             ),
             const Icon(
               Icons.notification_add_outlined,
