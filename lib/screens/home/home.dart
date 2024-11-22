@@ -10,12 +10,15 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import '../../services/transaction_data.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'all_transactions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return ScreenScaffold(
       appBarTitle: Padding(
         padding: const EdgeInsets.only(top: 8.0),
@@ -27,7 +30,30 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute<ProfileScreen>(
-                    builder: (context) => const ProfileScreen(),
+                    builder: (context) => ProfileScreen(
+                      appBar: AppBar(
+                        leading: GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Icon(
+                            Icons.clear_outlined,
+                            color: kColorGrey2,
+                          ),
+                        ),
+                        surfaceTintColor: kColorWhite,
+                        title: Text(
+                          'User Profile',
+                          style: kFontStyleLato,
+                        ),
+                        centerTitle: true,
+                      ),
+                      actions: [
+                        SignedOutAction((context) {
+                          Navigator.of(context).pop();
+                        })
+                      ],
+                    ),
                   ),
                 );
               },
@@ -37,16 +63,25 @@ class HomePage extends StatelessWidget {
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: kColorBlue, width: 2)),
-                    child: const Icon(
-                      Icons.person_outlined,
-                      color: kColorBlue,
-                      size: 26,
+                    child: ClipOval(
+                      child: user?.photoURL != null
+                          ? Image.network(
+                              user!.photoURL!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(
+                              Icons.person_outlined,
+                              color: kColorBlue,
+                              size: 40,
+                            ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 16.0),
                     child: Text(
-                      'Anna',
+                      user?.displayName ?? 'Guest',
                       style: kFontStyleLato.copyWith(
                           color: kColorBlue, fontSize: 16),
                     ),

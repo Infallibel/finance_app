@@ -3,6 +3,7 @@ import 'package:finance_app/utilities/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -16,6 +17,7 @@ class AuthGate extends StatelessWidget {
           return SignInScreen(
             providers: [
               EmailAuthProvider(),
+              GoogleProvider(clientId: '715082149329-vfvhces9mkbhvl9dtaq08oph4v49f8fm.apps.googleusercontent.com'),
             ],
             headerBuilder: (context, constraints, shrinkOffset) {
               return Padding(
