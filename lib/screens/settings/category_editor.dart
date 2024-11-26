@@ -110,7 +110,7 @@ class CategoryEditor extends StatelessWidget {
     final categoryId = category['id'];
 
     final isCategoryAssigned = transactionDataCubit.state.any((transaction) {
-      return transaction.category['id'] == categoryId;
+      return transaction.categoryId == categoryId;
     });
 
     if (isCategoryAssigned) {

@@ -33,8 +33,15 @@ class IconTextAndRow extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconTextCombined(
-                iconData: iconData, iconColor: iconColor, inputText: inputText),
+            Flexible(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: IconTextCombined(
+                    iconData: iconData,
+                    iconColor: iconColor,
+                    inputText: inputText),
+              ),
+            ),
             amount != null
                 ? TransactionAmount(
                     transactionType: transactionType!,
@@ -46,6 +53,7 @@ class IconTextAndRow extends StatelessWidget {
                           Text(
                             selectionText!,
                             style: kFontStyleLato.copyWith(color: kColorGrey1),
+                            overflow: TextOverflow.ellipsis,
                           ),
                           const Icon(
                             Icons.chevron_right_outlined,

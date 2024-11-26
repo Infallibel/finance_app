@@ -4,7 +4,7 @@ class TransactionData {
   final double amount;
   final String user;
   final DateTime date;
-  final Map<String, dynamic> category;
+  final String categoryId;
   final Map<String, dynamic> paymentType;
 
   ///tu nie będą tylko String, bo będzie to też to wyboru, np photo, czy notes
@@ -17,7 +17,7 @@ class TransactionData {
     required this.amount,
     required this.user,
     required this.date,
-    required this.category,
+    required this.categoryId,
     required this.paymentType,
     this.photo,
     this.note,
@@ -25,7 +25,7 @@ class TransactionData {
   // Create a copy of TransactionData with updated fields
   TransactionData copyWith({
     String? id,
-    Map<String, dynamic>? category,
+    String? categoryId,
     double? amount,
     DateTime? date,
     Map<String, dynamic>? paymentType,
@@ -36,7 +36,7 @@ class TransactionData {
   }) {
     return TransactionData(
       id: id ?? this.id,
-      category: category ?? this.category,
+      categoryId: categoryId ?? this.categoryId,
       amount: amount ?? this.amount,
       date: date ?? this.date,
       paymentType: paymentType ?? this.paymentType,

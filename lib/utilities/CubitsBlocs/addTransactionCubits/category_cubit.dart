@@ -4,144 +4,72 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-abstract class CategoryState {}
+abstract class CategoryState {
+  final List<Map<String, dynamic>> categories;
+  const CategoryState(this.categories);
 
-class InitialCategoryState extends CategoryState {}
+  /// Abstract getter for selected category ID
+  String? get selectedCategoryId => null;
+}
+
+class InitialCategoryState extends CategoryState {
+  InitialCategoryState(super.categories);
+}
 
 class CategorySelected extends CategoryState {
-  final Map<String, dynamic> category;
-  CategorySelected(this.category);
+  final String categoryId;
+
+  CategorySelected(this.categoryId, List<Map<String, dynamic>> categories)
+      : super(categories);
+
+  /// Override getter to return the selected category ID
+  @override
+  String? get selectedCategoryId => categoryId;
 }
 
 class CategoryAdded extends CategoryState {
-  final Map<String, dynamic> category;
-  CategoryAdded(this.category);
+  final Map<String, dynamic> newCategory;
+
+  CategoryAdded(this.newCategory, List<Map<String, dynamic>> categories)
+      : super(categories);
 }
 
 class CategoryUpdated extends CategoryState {
-  final Map<String, dynamic> category;
+  final Map<String, dynamic> updatedCategory;
   final int index;
-  CategoryUpdated(this.category, this.index);
+
+  CategoryUpdated(
+      this.updatedCategory, this.index, List<Map<String, dynamic>> categories)
+      : super(categories);
 }
 
 class CategoryDeleted extends CategoryState {
   final int index;
-  CategoryDeleted(this.index);
+
+  CategoryDeleted(this.index, List<Map<String, dynamic>> categories)
+      : super(categories);
 }
 
 class CategoryError extends CategoryState {
   final String message;
-  CategoryError(this.message);
+
+  CategoryError(this.message, List<Map<String, dynamic>> categories)
+      : super(categories);
 }
 
 class CategoryCubit extends Cubit<CategoryState> {
-  CategoryCubit() : super(InitialCategoryState());
+  List<Map<String, dynamic>> _categories;
 
-  List<Map<String, dynamic>> categories = [
-    {
-      'id': _generateId(),
-      'iconData': Icons.money_outlined,
-      'iconColor': kColorGreen,
-      'inputText': 'Salary',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.house_outlined,
-      'iconColor': kColorOlive,
-      'inputText': 'Household',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.shopping_cart_outlined,
-      'iconColor': kColorOrange,
-      'inputText': 'Grocery',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.health_and_safety_outlined,
-      'iconColor': kColorTurquoise,
-      'inputText': 'Health',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.extension_outlined,
-      'iconColor': kColorCoral,
-      'inputText': 'Entertainment',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.coffee_outlined,
-      'iconColor': kColorBrown,
-      'inputText': 'Coffee',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.restaurant_outlined,
-      'iconColor': kColorSoftRed,
-      'inputText': 'Restaurant',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.local_taxi_outlined,
-      'iconColor': kColorYellow,
-      'inputText': 'Taxi',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.bed_outlined,
-      'iconColor': kColorOliveGreen,
-      'inputText': 'Hotel',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.shopping_bag_outlined,
-      'iconColor': kColorPurple,
-      'inputText': 'Shopping',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.language_outlined,
-      'iconColor': kColorPink,
-      'inputText': 'Internet',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.redeem_outlined,
-      'iconColor': kColorLavender,
-      'inputText': 'Gift',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.airplanemode_active_outlined,
-      'iconColor': kColorDeepSkyBlue,
-      'inputText': 'Flights',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.local_gas_station_outlined,
-      'iconColor': kColorRust,
-      'inputText': 'Petrol',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.local_atm_outlined,
-      'iconColor': kColorAmber,
-      'inputText': 'Cash Deposit',
-    },
-    {
-      'id': _generateId(),
-      'iconData': Icons.local_atm,
-      'iconColor': kColorTeal,
-      'inputText': 'Cash Withdrawal',
-    },
-  ];
+  CategoryCubit(this._categories) : super(InitialCategoryState(_categories));
+
+  List<Map<String, dynamic>> get categories => _categories;
 
   static String _generateId() {
     return Uuid().v4();
   }
 
-  Future<void> showOptions(BuildContext context) async {
-    final selectedCategory = await showModalBottomSheet<Map<String, dynamic>>(
+  void showOptions(BuildContext context) async {
+    final selectedCategory = await showModalBottomSheet<String>(
       elevation: 0,
       backgroundColor: kColorWhite,
       context: context,
@@ -153,7 +81,7 @@ class CategoryCubit extends Cubit<CategoryState> {
               return ListTile(
                 splashColor: kColorLightBlueSecondary,
                 onTap: () {
-                  Navigator.of(context).pop(category);
+                  Navigator.of(context).pop(category['id']);
                 },
                 title: IconTextCombined(
                   iconData: category['iconData'],
@@ -168,36 +96,48 @@ class CategoryCubit extends Cubit<CategoryState> {
     );
 
     if (selectedCategory != null) {
-      selectCategory(selectedCategory);
+      selectCategoryById(selectedCategory);
     }
   }
 
   void addCategory(Map<String, dynamic> newCategory) {
     newCategory['id'] = _generateId();
-    categories.add(newCategory);
-    emit(CategoryAdded(newCategory));
+    final updatedCategories = List<Map<String, dynamic>>.from(_categories)
+      ..add(newCategory);
+    _categories = updatedCategories;
+    emit(CategoryAdded(newCategory, updatedCategories));
   }
 
   void updateCategory(int index, Map<String, dynamic> updatedCategory) {
-    updatedCategory['id'] = categories[index]['id'];
-    categories[index] = updatedCategory;
-    emit(CategoryUpdated(updatedCategory, index));
+    updatedCategory['id'] = _categories[index]['id']; // Retain the ID
+    final updatedCategories = List<Map<String, dynamic>>.from(_categories)
+      ..[index] = updatedCategory;
+    _categories = updatedCategories;
+    emit(CategoryUpdated(updatedCategory, index, updatedCategories));
   }
 
   void removeCategory(int index) {
-    categories.removeAt(index);
-    emit(CategoryDeleted(index));
+    final updatedCategories = List<Map<String, dynamic>>.from(_categories)
+      ..removeAt(index);
+    _categories = updatedCategories;
+    emit(CategoryDeleted(index, updatedCategories));
   }
 
-  void selectCategory(Map<String, dynamic> category) {
-    try {
-      emit(CategorySelected(category));
-    } catch (e) {
-      emit(CategoryError('Error selecting category: $e'));
-    }
+  void selectCategoryById(String categoryId) {
+    emit(CategorySelected(categoryId, _categories));
   }
 
   void clearCategory() {
-    emit(InitialCategoryState());
+    emit(InitialCategoryState(_categories));
+  }
+
+  Map<String, dynamic>? findCategoryById(String? categoryId) {
+    try {
+      return _categories.firstWhere(
+        (category) => category['id'] == categoryId,
+      );
+    } catch (e) {
+      return null;
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/transaction_data.dart';
+import '../../utilities/CubitsBlocs/addTransactionCubits/category_cubit.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/CubitsBlocs/month_year_cubit.dart';
 import '../../widgets/formatted_balance_text.dart';
@@ -27,7 +28,7 @@ class AnalyticsPage extends StatelessWidget {
                 builder: (context, monthYearState) {
                   final transactionDataCubit =
                       context.watch<TransactionDataCubit>();
-
+                  final categoryCubit = context.watch<CategoryCubit>();
                   final transactions = transactionDataCubit.state.where(
                       (transaction) =>
                           transaction.date.month == monthYearState.month &&
@@ -40,14 +41,19 @@ class AnalyticsPage extends StatelessWidget {
                       transaction.transactionType == 'Expenses');
 
                   for (var transaction in expenses) {
-                    final category = transaction.category['inputText'];
-                    final color = transaction.category['iconColor'];
-                    transactionsByCategory.update(
-                      category,
-                      (total) => total + transaction.amount,
-                      ifAbsent: () => transaction.amount,
-                    );
-                    categoryColors[category] = color;
+                    final categoryId = transaction.categoryId;
+                    final category = categoryCubit.findCategoryById(categoryId);
+
+                    if (category != null) {
+                      final categoryName = category['inputText'];
+                      final categoryColor = category['iconColor'];
+                      transactionsByCategory.update(
+                        categoryName,
+                        (total) => total + transaction.amount,
+                        ifAbsent: () => transaction.amount,
+                      );
+                      categoryColors[categoryName] = categoryColor;
+                    }
                   }
 
                   final ordinalDataList = transactionsByCategory.entries.map(

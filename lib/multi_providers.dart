@@ -9,6 +9,7 @@ import 'package:finance_app/utilities/CubitsBlocs/savingsCubits/goal_data_cubit.
 import 'package:finance_app/utilities/CubitsBlocs/savingsCubits/goal_load_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/settingsCubits/currency_cubit.dart';
 import 'package:finance_app/utilities/CubitsBlocs/transaction_load_cubit.dart';
+import 'package:finance_app/utilities/categories_data.dart';
 import 'package:finance_app/utilities/constants.dart';
 import 'package:finance_app/widgets/bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class MultiProviders extends StatelessWidget {
     return MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => CategoryCubit(),
+            create: (context) => CategoryCubit(categories),
           ),
           BlocProvider(
             create: (context) => DateCubit(),

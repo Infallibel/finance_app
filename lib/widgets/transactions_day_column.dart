@@ -20,19 +20,11 @@ class TransactionDayColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<CategoryCubit, CategoryState>(
       builder: (context, state) {
-        final updatedTransactions = transactions.map((transaction) {
-          if (state is CategoryUpdated) {
-            if (transaction.category['id'] == state.category['id']) {
-              return transaction.copyWith(category: state.category);
-            }
-          } else if (state is CategoryDeleted) {
-            if (transaction.category['id'] ==
-                context.read<CategoryCubit>().categories[state.index]['id']) {
-              return transaction.copyWith(category: null); // Reset category
-            }
-          }
-          return transaction;
-        });
+        // Use safe null-checking
+        final categories =
+            (state is InitialCategoryState || state is CategorySelected)
+                ? state.categories
+                : <Map<String, dynamic>>[];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,11 +36,16 @@ class TransactionDayColumn extends StatelessWidget {
                 style: kFontStyleLato.copyWith(color: kColorGrey2),
               ),
             ),
-            ...updatedTransactions.map((transaction) {
+            ...transactions.map((transaction) {
+              final category = categories.firstWhere(
+                (cat) => cat['id'] == transaction.categoryId,
+                orElse: () => <String, dynamic>{},
+              );
+              bool hasCategory = category.isNotEmpty;
               return IconTextAndRow(
-                iconData: transaction.category['iconData'],
-                iconColor: transaction.category['iconColor'],
-                inputText: transaction.category['inputText'],
+                iconData: hasCategory ? category['iconData'] : Icons.error,
+                iconColor: hasCategory ? category['iconColor'] : kColorGrey1,
+                inputText: hasCategory ? category['inputText'] : 'Unknown',
                 transactionType: transaction.transactionType,
                 amount: transaction.transactionType == 'Expenses'
                     ? -transaction.amount

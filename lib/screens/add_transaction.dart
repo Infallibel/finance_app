@@ -14,11 +14,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/note_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddTransactionPage extends StatelessWidget {
   AddTransactionPage({super.key});
 
-  final String user = 'Anna';
+  final user = FirebaseAuth.instance.currentUser;
 
   /// TODO handle user selection (login etc.) and make it so when transaction is added it is picked automatically as a logged user
 
@@ -45,25 +46,28 @@ class AddTransactionPage extends StatelessWidget {
     if (amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a valid amount greater than 0',
-              textAlign: TextAlign.center),
+          content: Text(
+            'Please enter a valid amount greater than 0',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
       return;
     }
-    if (categoryState is CategorySelected &&
+
+    if (categoryState.selectedCategoryId != null &&
         dateState is DateSelected &&
         paymentTypeState is PaymentTypeSelected &&
         transactionTypeState is TransactionTypeSelected) {
       final String transactionId = const Uuid().v4();
       final transactionData = TransactionData(
         id: transactionId,
-        category: categoryState.category,
-        amount: double.tryParse(numberTextController.text) ?? 0.0,
+        categoryId: categoryState.selectedCategoryId!, // Use categoryId
+        amount: amount,
         date: dateState.date,
         paymentType: paymentTypeState.paymentType,
         transactionType: transactionTypeState.transactionType,
-        user: user,
+        user: user?.displayName ?? 'Guest',
         note: notesState.note.isNotEmpty ? notesState.note : null,
       );
 
@@ -75,8 +79,10 @@ class AddTransactionPage extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text('Please fill all the details', textAlign: TextAlign.center),
+          content: Text(
+            'Please fill all the details',
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }
@@ -126,10 +132,11 @@ class AddTransactionPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       IconTextAndRow(
-                          selectionText: 'Selected',
-                          iconData: Icons.person_outlined,
-                          iconColor: kColorGrey1,
-                          inputText: user),
+                        selectionText: 'Selected',
+                        iconData: Icons.person_outlined,
+                        iconColor: kColorGrey1,
+                        inputText: user?.displayName ?? 'Guest',
+                      ),
                       BlocBuilder<DateCubit, DateState>(
                         builder: (context, state) {
                           if (state is DateSelected) {
@@ -158,22 +165,34 @@ class AddTransactionPage extends StatelessWidget {
                       ),
                       BlocBuilder<CategoryCubit, CategoryState>(
                         builder: (context, state) {
+                          final selectedCategoryId = state.selectedCategoryId;
+                          final categories = state.categories;
+
+                          // Fetch the selected category dynamically
+                          final selectedCategory = selectedCategoryId != null
+                              ? categories.firstWhere(
+                                  (cat) => cat['id'] == selectedCategoryId,
+                                  orElse: () => {},
+                                )
+                              : null;
+
                           return IconTextAndRow(
-                              selectionText: state is CategorySelected
-                                  ? 'Selected'
-                                  : 'Not Selected',
-                              onTap: () {
-                                context
-                                    .read<CategoryCubit>()
-                                    .showOptions(context);
-                              },
-                              iconData: state is CategorySelected
-                                  ? state.category['iconData']
-                                  : Icons.folder_copy_outlined,
-                              iconColor: kColorGrey1,
-                              inputText: state is CategorySelected
-                                  ? state.category['inputText']
-                                  : 'Category');
+                            selectionText: selectedCategoryId != null
+                                ? 'Selected'
+                                : 'Not Selected',
+                            onTap: () {
+                              context
+                                  .read<CategoryCubit>()
+                                  .showOptions(context);
+                            },
+                            iconData: selectedCategory != null
+                                ? selectedCategory['iconData']
+                                : Icons.folder_copy_outlined,
+                            iconColor: kColorGrey1,
+                            inputText: selectedCategory != null
+                                ? selectedCategory['inputText']
+                                : 'Category',
+                          );
                         },
                       ),
                       BlocBuilder<PaymentTypeCubit, PaymentTypeState>(

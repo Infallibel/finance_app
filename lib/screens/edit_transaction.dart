@@ -30,7 +30,9 @@ class EditTransactionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<CategoryCubit>().selectCategory(transactionData.category);
+    context
+        .read<CategoryCubit>()
+        .selectCategoryById(transactionData.categoryId);
     context.read<DateCubit>().selectDate(transactionData.date);
     context
         .read<PaymentTypeCubit>()
@@ -112,19 +114,28 @@ class EditTransactionPage extends StatelessWidget {
 
                   BlocBuilder<CategoryCubit, CategoryState>(
                     builder: (context, state) {
+                      // Access the CategoryCubit to resolve the selected category
+                      final categoryCubit = context.read<CategoryCubit>();
+                      Map<String, dynamic>? selectedCategory;
+
+                      if (state is CategorySelected) {
+                        selectedCategory = categoryCubit
+                            .findCategoryById(state.selectedCategoryId);
+                      }
+
                       return IconTextAndRow(
-                        selectionText: state is CategorySelected
+                        selectionText: selectedCategory != null
                             ? 'Selected'
                             : 'Not Selected',
                         onTap: () {
                           context.read<CategoryCubit>().showOptions(context);
                         },
-                        iconData: state is CategorySelected
-                            ? state.category['iconData']
+                        iconData: selectedCategory != null
+                            ? selectedCategory['iconData']
                             : Icons.folder_copy_outlined,
                         iconColor: kColorGrey1,
-                        inputText: state is CategorySelected
-                            ? state.category['inputText']
+                        inputText: selectedCategory != null
+                            ? selectedCategory['inputText']
                             : 'Category',
                       );
                     },
@@ -193,12 +204,12 @@ class EditTransactionPage extends StatelessWidget {
                   onPressed: () {
                     final updatedTransaction = transactionData.copyWith(
                       amount: double.tryParse(amountController.text) ?? 0.0,
-                      category: context.read<CategoryCubit>().state
+                      categoryId: context.read<CategoryCubit>().state
                               is CategorySelected
                           ? (context.read<CategoryCubit>().state
                                   as CategorySelected)
-                              .category
-                          : transactionData.category,
+                              .categoryId
+                          : transactionData.categoryId,
                       paymentType: context.read<PaymentTypeCubit>().state
                               is PaymentTypeSelected
                           ? (context.read<PaymentTypeCubit>().state
