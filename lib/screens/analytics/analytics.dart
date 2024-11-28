@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:finance_app/widgets/screen_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/transaction_data.dart';
-import '../../utilities/CubitsBlocs/addTransactionCubits/category_cubit.dart';
+import 'package:finance_app/utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import '../../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import '../../utilities/CubitsBlocs/month_year_cubit.dart';
 import '../../widgets/formatted_balance_text.dart';

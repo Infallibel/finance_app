@@ -18,52 +18,45 @@ class TransactionDayColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CategoryCubit, CategoryState>(
-      builder: (context, state) {
-        // Use safe null-checking
-        final categories =
-            (state is InitialCategoryState || state is CategorySelected)
-                ? state.categories
-                : <Map<String, dynamic>>[];
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: Text(
-                day,
-                style: kFontStyleLato.copyWith(color: kColorGrey2),
-              ),
-            ),
-            ...transactions.map((transaction) {
-              final category = categories.firstWhere(
-                (cat) => cat['id'] == transaction.categoryId,
-                orElse: () => <String, dynamic>{},
+    final state = context.watch<CategoryCubit>();
+    final categories = state.categories;
+    debugPrint('TransactionDayColumn rebuild: categories = $categories');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6.0),
+          child: Text(
+            day,
+            style: kFontStyleLato.copyWith(color: kColorGrey2),
+          ),
+        ),
+        ...transactions.map((transaction) {
+          final category = categories.firstWhere(
+            (cat) => cat['id'] == transaction.categoryId,
+            orElse: () => <String, dynamic>{},
+          );
+          bool hasCategory = category.isNotEmpty;
+          return IconTextAndRow(
+            iconData: hasCategory ? category['iconData'] : Icons.error,
+            iconColor: hasCategory ? category['iconColor'] : kColorGrey1,
+            inputText: hasCategory ? category['inputText'] : 'Unknown',
+            transactionType: transaction.transactionType,
+            amount: transaction.transactionType == 'Expenses'
+                ? -transaction.amount
+                : transaction.amount,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      EditTransactionPage(transactionData: transaction),
+                ),
               );
-              bool hasCategory = category.isNotEmpty;
-              return IconTextAndRow(
-                iconData: hasCategory ? category['iconData'] : Icons.error,
-                iconColor: hasCategory ? category['iconColor'] : kColorGrey1,
-                inputText: hasCategory ? category['inputText'] : 'Unknown',
-                transactionType: transaction.transactionType,
-                amount: transaction.transactionType == 'Expenses'
-                    ? -transaction.amount
-                    : transaction.amount,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditTransactionPage(transactionData: transaction),
-                    ),
-                  );
-                },
-              );
-            }),
-          ],
-        );
-      },
+            },
+          );
+        }),
+      ],
     );
   }
 }
