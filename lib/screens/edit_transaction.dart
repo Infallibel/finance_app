@@ -1,3 +1,4 @@
+import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
 import 'package:finance_app/widgets/transactions_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,7 +8,7 @@ import '../utilities/CubitsBlocs/addTransactioncubits/category_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/date_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/note_cubit.dart';
 import '../utilities/CubitsBlocs/addTransactioncubits/payment_type_cubit.dart';
-import '../utilities/CubitsBlocs/addTransactioncubits/transaction_data_cubit.dart';
+
 import '../utilities/CubitsBlocs/addTransactioncubits/transaction_type_cubit.dart';
 import '../utilities/constants.dart';
 import '../widgets/icon_text_row.dart';
@@ -252,7 +253,7 @@ class EditTransactionPage extends StatelessWidget {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
+                      builder: (BuildContext dialogContext) {
                         return AlertDialog(
                           content: Text(
                             'Are you sure you want to delete this transaction?',
@@ -271,7 +272,7 @@ class EditTransactionPage extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () {
-                                Navigator.of(context).pop();
+                                Navigator.of(dialogContext).pop();
                               },
                               child: Text(
                                 'No',
@@ -308,7 +309,7 @@ class EditTransactionPage extends StatelessWidget {
                                     .clearTransactionType();
                                 context.read<NotesCubit>().updateNote('');
 
-                                Navigator.pop(context);
+                                Navigator.pop(dialogContext);
                                 Navigator.pop(context);
                               },
                               child: Text(
