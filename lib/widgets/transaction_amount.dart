@@ -64,13 +64,13 @@ class TransactionAmount extends StatelessWidget {
               ),
             ),
             Text(
-              '.$fractionPart ',
+              '.$fractionPart',
               style: kFontStyleLato.copyWith(
                 fontWeight: FontWeight.bold,
                 color: fractionPartColor,
               ),
             ),
-            Text(symbolBefore ? '' : symbol,
+            Text(symbolBefore ? '' : ' $symbol',
                 style: kFontStyleLato.copyWith(
                   fontWeight: FontWeight.bold,
                   color: wholePartColor,

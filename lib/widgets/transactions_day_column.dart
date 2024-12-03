@@ -18,9 +18,8 @@ class TransactionDayColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<CategoryCubit>();
+    final state = context.read<CategoryCubit>();
     final categories = state.categories;
-    debugPrint('TransactionDayColumn rebuild: categories = $categories');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
